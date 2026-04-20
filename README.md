@@ -78,10 +78,45 @@ If you intentionally migrate the repo to a newer LTS later, update both:
 1. `.mvn/java-version`
 2. `maven.compiler.release` in `pom.xml`
 
-Recommended next implementation steps:
+## Runtime Verification
 
-1. define one repeatable command path for running the shared contract tests against a supplied base URL
-2. add a documented Spring Boot `in-memory` runtime verification flow
-3. add a documented Quarkus `in-memory` runtime verification flow
-4. capture the runtime verification commands, ports, and prerequisites in the repo docs
-5. move next to PostgreSQL-backed verification once the `in-memory` parity baseline is stable
+Prerequisites:
+
+- Java `25`
+- use `./mvnw` from the repository root
+- internet access on the first run if Maven still needs to download dependencies from Maven Central
+- no PostgreSQL instance is required for the baseline `in-memory` verification flows
+
+Run the shared HTTP contract suite against any already-running runtime:
+
+```bash
+./scripts/run-contract-tests.sh http://localhost:8080
+```
+
+Run the full Spring Boot `in-memory` verification flow on `http://localhost:8080`:
+
+```bash
+./scripts/verify-spring.sh
+```
+
+Run the full Quarkus `in-memory` verification flow on `http://localhost:8081`:
+
+```bash
+./scripts/verify-quarkus.sh
+```
+
+The runtime verification scripts all follow the same baseline flow:
+
+1. package the selected runtime and the shared modules it depends on
+2. start the runtime on its baseline local port
+3. wait until `GET /api/v1/document-generations` responds with `200`
+4. execute the shared `document-generator-contract-tests` suite against that base URL
+5. stop the runtime process
+
+## Next Comparison Steps
+
+After the `in-memory` parity baseline stays green for both runtimes, the next changes should focus on:
+
+1. PostgreSQL-backed runtime verification for Spring Boot and Quarkus
+2. JVM-mode comparison using the same verified HTTP contract baseline
+3. native-image comparison after the PostgreSQL-backed parity path is stable

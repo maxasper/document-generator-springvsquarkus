@@ -1,8 +1,6 @@
 package com.example.documentgenerator.spring.config;
 
 import com.example.documentgenerator.adapter.renderer.stub.StubDocumentRenderer;
-import com.example.documentgenerator.application.port.in.GenerateDocumentUseCase;
-import com.example.documentgenerator.application.port.in.ListGenerationHistoryUseCase;
 import com.example.documentgenerator.application.port.out.DocumentRenderer;
 import com.example.documentgenerator.application.port.out.GenerationRequestRepository;
 import com.example.documentgenerator.application.service.DocumentGenerationService;
@@ -82,16 +80,6 @@ public class DocumentGeneratorConfiguration {
                 generationRequestRepository,
                 documentRenderer
         );
-    }
-
-    @Bean
-    GenerateDocumentUseCase generateDocumentUseCase(DocumentGenerationService documentGenerationService) {
-        return documentGenerationService;
-    }
-
-    @Bean
-    ListGenerationHistoryUseCase listGenerationHistoryUseCase(DocumentGenerationService documentGenerationService) {
-        return documentGenerationService;
     }
 
     private static DataSource requireDataSource(ObjectProvider<DataSource> dataSourceProvider) {
