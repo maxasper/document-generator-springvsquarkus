@@ -1,0 +1,6 @@
+.idea
+.codex
+target
+.mvn/repository
+.mvn/wrapper/maven-wrapper.jar
+openspec
