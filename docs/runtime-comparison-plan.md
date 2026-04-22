@@ -1,6 +1,6 @@
 # Runtime Comparison Plan
 
-These tasks start after Spring Boot and Quarkus are functionally aligned and pass the same runtime contract tests.
+These tasks start after Spring Boot and Quarkus are functionally aligned, pass the same runtime contract tests in `in-memory` mode, and pass the same PostgreSQL-backed verification flow against the shared database setup.
 
 ## JVM Mode
 

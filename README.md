@@ -48,14 +48,14 @@ For the current Spring slice, the default mode is `in-memory`. A PostgreSQL-back
 - [docs/roadmap.md](docs/roadmap.md)
 - [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md)
 - [docs/runtime-comparison-plan.md](docs/runtime-comparison-plan.md)
-- [openspec/changes/add-runtime-e2e-verification/proposal.md](openspec/changes/add-runtime-e2e-verification/proposal.md)
+- [openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md](openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md)
 - [openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md](openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md)
 
 ## Spec-First Workflow
 
 The initial foundation change `establish-document-generator-foundation` is archived and its specs have been synced into `openspec/specs/`.
 
-The current active change is `add-runtime-e2e-verification`. It defines the next milestone: running the same HTTP contract suite against the Spring Boot and Quarkus applications in `in-memory` mode before moving to PostgreSQL-backed and native-image comparisons.
+The most recently completed change is `postgres-backed-runtime-verification`. It extends runtime verification from the initial `in-memory` baseline to a repeatable PostgreSQL-backed flow for Spring Boot and Quarkus before JVM and native-image comparison work.
 
 ## Maven Wrapper
 
@@ -86,6 +86,7 @@ Prerequisites:
 - use `./mvnw` from the repository root
 - internet access on the first run if Maven still needs to download dependencies from Maven Central
 - no PostgreSQL instance is required for the baseline `in-memory` verification flows
+- Docker and Docker Compose are required for the PostgreSQL-backed verification flows
 
 Run the shared HTTP contract suite against any already-running runtime:
 
@@ -105,6 +106,18 @@ Run the full Quarkus `in-memory` verification flow on `http://localhost:8081`:
 ./scripts/verify-quarkus.sh
 ```
 
+Run the full Spring Boot PostgreSQL-backed verification flow on `http://localhost:18080`:
+
+```bash
+./scripts/verify-spring-postgres.sh
+```
+
+Run the full Quarkus PostgreSQL-backed verification flow on `http://localhost:18081`:
+
+```bash
+./scripts/verify-quarkus-postgres.sh
+```
+
 The runtime verification scripts all follow the same baseline flow:
 
 1. package the selected runtime and the shared modules it depends on
@@ -113,10 +126,26 @@ The runtime verification scripts all follow the same baseline flow:
 4. execute the shared `document-generator-contract-tests` suite against that base URL
 5. stop the runtime process
 
+The PostgreSQL-backed verification scripts add one extra step before runtime startup:
+
+1. recreate the Compose-backed PostgreSQL verification environment from `compose.postgres-verification.yml`
+2. inject the PostgreSQL connection settings into the selected runtime
+3. start Spring Boot on `18080` or Quarkus on `18081`
+4. run the shared contract tests
+5. tear down the PostgreSQL container and its data volume
+
+Baseline PostgreSQL-backed verification settings:
+
+- host: `localhost`
+- port: `55432`
+- database: `document_generator`
+- username: `document_generator`
+- password: `document_generator`
+
 ## Next Comparison Steps
 
-After the `in-memory` parity baseline stays green for both runtimes, the next changes should focus on:
+After the PostgreSQL-backed parity baseline stays green for both runtimes, the next changes should focus on:
 
-1. PostgreSQL-backed runtime verification for Spring Boot and Quarkus
-2. JVM-mode comparison using the same verified HTTP contract baseline
-3. native-image comparison after the PostgreSQL-backed parity path is stable
+1. JVM-mode comparison using the same verified PostgreSQL-backed contract baseline
+2. native-image comparison after the JVM-mode comparison path is stable
+3. containerized application-runtime comparison only if the benchmark harness needs tighter CPU or memory normalization
