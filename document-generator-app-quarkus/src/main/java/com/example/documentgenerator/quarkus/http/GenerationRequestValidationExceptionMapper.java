@@ -7,7 +7,8 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-public class GenerationRequestValidationExceptionMapper implements ExceptionMapper<GenerationRequestValidationException> {
+public class GenerationRequestValidationExceptionMapper
+        implements ExceptionMapper<GenerationRequestValidationException> {
     @Override
     public Response toResponse(GenerationRequestValidationException exception) {
         return Response.status(Response.Status.BAD_REQUEST)

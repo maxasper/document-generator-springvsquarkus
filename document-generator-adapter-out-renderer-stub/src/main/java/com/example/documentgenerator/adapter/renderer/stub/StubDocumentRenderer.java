@@ -1,7 +1,6 @@
 package com.example.documentgenerator.adapter.renderer.stub;
 
 import com.example.documentgenerator.application.port.out.DocumentRenderer;
-import com.example.documentgenerator.domain.model.DocumentFormat;
 import com.example.documentgenerator.domain.model.GeneratedDocument;
 import com.example.documentgenerator.domain.model.GenerationRequest;
 

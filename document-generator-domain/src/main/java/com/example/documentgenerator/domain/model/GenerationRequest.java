@@ -2,7 +2,6 @@ package com.example.documentgenerator.domain.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public record GenerationRequest(
         DocumentFormat documentFormat,

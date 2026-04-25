@@ -20,4 +20,43 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-framework-neutral-core</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>false</searchTransitive>
+                                    <excludes>
+                                        <exclude>org.springframework:*</exclude>
+                                        <exclude>org.springframework.boot:*</exclude>
+                                        <exclude>io.quarkus:*</exclude>
+                                        <exclude>jakarta.enterprise:*</exclude>
+                                        <exclude>jakarta.inject:*</exclude>
+                                        <exclude>jakarta.persistence:*</exclude>
+                                        <exclude>jakarta.servlet:*</exclude>
+                                        <exclude>jakarta.ws.rs:*</exclude>
+                                        <exclude>org.flywaydb:*</exclude>
+                                        <exclude>org.postgresql:*</exclude>
+                                    </excludes>
+                                    <message>
+                                        document-generator-application must stay framework-neutral to preserve the Spring vs Quarkus comparison boundary.
+                                    </message>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

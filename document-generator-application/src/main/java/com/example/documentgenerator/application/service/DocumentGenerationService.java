@@ -22,9 +22,18 @@ public final class DocumentGenerationService implements GenerateDocumentUseCase,
             GenerationRequestRepository generationRequestRepository,
             DocumentRenderer documentRenderer
     ) {
-        this.templateParameterValidator = Objects.requireNonNull(templateParameterValidator, "templateParameterValidator must not be null");
-        this.generationRequestRepository = Objects.requireNonNull(generationRequestRepository, "generationRequestRepository must not be null");
-        this.documentRenderer = Objects.requireNonNull(documentRenderer, "documentRenderer must not be null");
+        this.templateParameterValidator = Objects.requireNonNull(
+                templateParameterValidator,
+                "templateParameterValidator must not be null"
+        );
+        this.generationRequestRepository = Objects.requireNonNull(
+                generationRequestRepository,
+                "generationRequestRepository must not be null"
+        );
+        this.documentRenderer = Objects.requireNonNull(
+                documentRenderer,
+                "documentRenderer must not be null"
+        );
     }
 
     @Override

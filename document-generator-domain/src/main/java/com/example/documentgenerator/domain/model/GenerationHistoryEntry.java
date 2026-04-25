@@ -3,7 +3,6 @@ package com.example.documentgenerator.domain.model;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public record GenerationHistoryEntry(

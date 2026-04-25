@@ -6,6 +6,9 @@
 - let both runtime applications depend on the same core modules
 - keep runtime-specific HTTP and persistence code local to each application module
 - share only adapters that are framework-neutral and clearly reusable
+- treat the two runtime modules as this repository's project-specific adaptation of `bootstrap + adapters`, not as generic feature modules
+
+See [project-rules.md](project-rules.md) for the repository-wide rules used in this project.
 
 ## Proposed Maven Modules
 

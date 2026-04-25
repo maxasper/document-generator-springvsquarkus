@@ -34,7 +34,10 @@ public class DocumentGenerationResource {
         var generatedDocument = generateDocumentUseCase.generate(requestBody.toCommand());
         return Response.ok(generatedDocument.content())
                 .type(generatedDocument.contentType())
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + generatedDocument.fileName() + "\"")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + generatedDocument.fileName() + "\""
+                )
                 .build();
     }
 

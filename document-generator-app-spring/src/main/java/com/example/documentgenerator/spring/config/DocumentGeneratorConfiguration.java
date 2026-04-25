@@ -65,7 +65,9 @@ public class DocumentGeneratorConfiguration {
         return switch (persistenceMode) {
             case "in-memory" -> new InMemoryGenerationRequestRepository();
             case "jdbc" -> new JdbcGenerationRequestRepository(requireDataSource(dataSourceProvider), objectMapper);
-            default -> throw new IllegalArgumentException("Unsupported document-generator.persistence-mode: " + persistenceMode);
+            default -> throw new IllegalArgumentException(
+                    "Unsupported document-generator.persistence-mode: " + persistenceMode
+            );
         };
     }
 
@@ -85,7 +87,9 @@ public class DocumentGeneratorConfiguration {
     private static DataSource requireDataSource(ObjectProvider<DataSource> dataSourceProvider) {
         var dataSource = dataSourceProvider.getIfAvailable();
         if (dataSource == null) {
-            throw new IllegalStateException("document-generator.persistence-mode=jdbc requires a configured DataSource");
+            throw new IllegalStateException(
+                    "document-generator.persistence-mode=jdbc requires a configured DataSource"
+            );
         }
         return dataSource;
     }

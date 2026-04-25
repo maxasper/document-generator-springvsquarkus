@@ -13,6 +13,10 @@
     <artifactId>document-generator-app-quarkus</artifactId>
     <name>document-generator-app-quarkus</name>
 
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

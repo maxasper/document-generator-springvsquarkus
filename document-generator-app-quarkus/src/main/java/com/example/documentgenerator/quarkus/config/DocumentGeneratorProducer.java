@@ -34,7 +34,10 @@ public class DocumentGeneratorProducer {
     @Produces
     @Singleton
     GenerationRequestRepository generationRequestRepository(
-            @ConfigProperty(name = "document-generator.persistence.mode", defaultValue = "in-memory") String persistenceMode,
+            @ConfigProperty(
+                    name = "document-generator.persistence.mode",
+                    defaultValue = "in-memory"
+            ) String persistenceMode,
             Instance<DataSource> dataSourceInstance,
             ObjectMapper objectMapper
     ) {
@@ -63,7 +66,9 @@ public class DocumentGeneratorProducer {
 
     private static DataSource requireDataSource(Instance<DataSource> dataSourceInstance) {
         if (dataSourceInstance.isUnsatisfied()) {
-            throw new IllegalStateException("document-generator.persistence-mode=jdbc requires a configured DataSource");
+            throw new IllegalStateException(
+                    "document-generator.persistence-mode=jdbc requires a configured DataSource"
+            );
         }
         return dataSourceInstance.get();
     }

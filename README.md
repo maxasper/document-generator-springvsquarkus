@@ -44,6 +44,7 @@ For the current Spring slice, the default mode is `in-memory`. A PostgreSQL-back
 ## Repository Guide
 
 - [docs/module-structure.md](docs/module-structure.md)
+- [docs/project-rules.md](docs/project-rules.md)
 - [docs/v1-scope.md](docs/v1-scope.md)
 - [docs/roadmap.md](docs/roadmap.md)
 - [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md)
@@ -77,6 +78,17 @@ If you intentionally migrate the repo to a newer LTS later, update both:
 
 1. `.mvn/java-version`
 2. `maven.compiler.release` in `pom.xml`
+
+## Quality Gates
+
+Run `./mvnw verify` from the repository root to execute the current shared build baseline:
+
+1. Java and Maven version enforcement
+2. unit tests and module packaging
+3. repository-wide Checkstyle in `verify`
+4. per-module JaCoCo reports plus the aggregate report at `document-generator-quality-report/target/site/jacoco-aggregate`
+
+The quality baseline is intentionally shared across Spring Boot and Quarkus so the framework comparison is constrained by the same core rules.
 
 ## Runtime Verification
 

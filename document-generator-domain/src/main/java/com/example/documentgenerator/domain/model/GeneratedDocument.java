@@ -1,7 +1,6 @@
 package com.example.documentgenerator.domain.model;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public record GeneratedDocument(
         String fileName,

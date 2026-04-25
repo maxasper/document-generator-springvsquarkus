@@ -6,10 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+    @RestControllerAdvice
 public class DocumentGenerationExceptionHandler {
     @ExceptionHandler(GenerationRequestValidationException.class)
-    public ResponseEntity<ValidationErrorResponse> handleValidationError(GenerationRequestValidationException exception) {
+    public ResponseEntity<ValidationErrorResponse> handleValidationError(
+            GenerationRequestValidationException exception
+    ) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ValidationErrorResponse(exception.errors()));
     }

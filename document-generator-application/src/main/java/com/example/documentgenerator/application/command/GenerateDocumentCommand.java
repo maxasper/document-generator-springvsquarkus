@@ -6,7 +6,6 @@ import com.example.documentgenerator.domain.model.TemplateType;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public record GenerateDocumentCommand(
         DocumentFormat documentFormat,
