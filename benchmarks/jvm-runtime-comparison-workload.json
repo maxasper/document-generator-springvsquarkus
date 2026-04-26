@@ -1,0 +1,61 @@
+{
+    "schemaVersion": 1,
+    "benchmarkName": "jvm-runtime-comparison",
+    "runtimeMode": "postgres",
+    "output": {
+        "rootDirectory": "target/jvm-runtime-comparison",
+        "latestSymlinkName": "latest"
+    },
+    "readiness": {
+        "path": "/api/v1/document-generations",
+        "expectedStatus": 200,
+        "timeoutSeconds": 60
+    },
+    "warmup": {
+        "generateIterations": 3,
+        "historyIterations": 3
+    },
+    "measurement": {
+        "generateIterations": 5,
+        "historyIterations": 5
+    },
+    "requestTemplate": {
+        "documentFormat": "TXT",
+        "templateType": "INVOICE",
+        "documentNamePrefix": "benchmark-document",
+        "parameters": {
+            "customerName": "Acme Benchmark",
+            "invoiceNumberPrefix": "INV-BENCH",
+            "amount": "10"
+        }
+    },
+    "endpoints": {
+        "generate": {
+            "method": "POST",
+            "path": "/api/v1/document-generations",
+            "contentType": "application/json"
+        },
+        "history": {
+            "method": "GET",
+            "path": "/api/v1/document-generations"
+        }
+    },
+    "metrics": {
+        "buildDurationMs": "Build duration for the selected runtime artifact.",
+        "artifactSizeBytes": "Packaged runtime artifact size in bytes.",
+        "startupDurationMs": "Time from runtime launch until readiness endpoint returns 200.",
+        "steadyStateRssKb": "Resident set size in kilobytes after warmup and measured requests.",
+        "generateLatencyMs": {
+            "count": "Number of measured generate requests.",
+            "min": "Fastest measured generate request duration.",
+            "max": "Slowest measured generate request duration.",
+            "avg": "Average measured generate request duration."
+        },
+        "historyLatencyMs": {
+            "count": "Number of measured history requests.",
+            "min": "Fastest measured history request duration.",
+            "max": "Slowest measured history request duration.",
+            "avg": "Average measured history request duration."
+        }
+    }
+}

@@ -154,10 +154,70 @@ Baseline PostgreSQL-backed verification settings:
 - username: `document_generator`
 - password: `document_generator`
 
+## JVM Runtime Comparison
+
+Prerequisites:
+
+- Java `25`
+- Docker and Docker Compose
+- `curl`
+- `jq`
+- use `./mvnw` from the repository root
+- prefer a warm dependency cache in `.mvn/repository` if you want the build-time metric to reflect packaging work instead of first-time downloads
+
+The shared benchmark contract is defined in:
+
+- `benchmarks/jvm-runtime-comparison-workload.json`
+- `benchmarks/jvm-runtime-comparison-report.schema.json`
+
+Run the Spring Boot JVM benchmark flow:
+
+```bash
+./scripts/benchmark-spring-jvm.sh
+```
+
+Run the Quarkus JVM benchmark flow:
+
+```bash
+./scripts/benchmark-quarkus-jvm.sh
+```
+
+Run the combined JVM comparison flow:
+
+```bash
+./scripts/benchmark-jvm-comparison.sh
+```
+
+The JVM benchmark flows all reuse the PostgreSQL-backed runtime path and measure:
+
+1. build duration
+2. packaged runtime artifact size
+3. cold startup time until `GET /api/v1/document-generations` returns `200`
+4. steady-state RSS after warmup and measured requests
+5. measured latency for `POST /api/v1/document-generations`
+6. measured latency for `GET /api/v1/document-generations`
+
+Generated benchmark output is written under `target/jvm-runtime-comparison/`.
+
+- `latest/` points to the most recent run directory
+- per-runtime flows emit one `report.json` plus `runtime.log`
+- the combined flow emits:
+  - `spring/report.json`
+  - `quarkus/report.json`
+  - `report.json`
+  - `summary.txt`
+
+Interpretation limits:
+
+- this is a local comparison harness, not a statistically rigorous load test
+- compare results only across runs made on the same machine with similar background load
+- Spring Boot artifact size is measured from the packaged fat jar
+- Quarkus artifact size is measured from the packaged `quarkus-app/` directory
+- the first implementation is Linux-first for RSS and memory environment capture
+
 ## Next Comparison Steps
 
-After the PostgreSQL-backed parity baseline stays green for both runtimes, the next changes should focus on:
+After the JVM-mode baseline stays green and stable, the next changes should focus on:
 
-1. JVM-mode comparison using the same verified PostgreSQL-backed contract baseline
-2. native-image comparison after the JVM-mode comparison path is stable
-3. containerized application-runtime comparison only if the benchmark harness needs tighter CPU or memory normalization
+1. native-image comparison using the same verified PostgreSQL-backed behavioral baseline
+2. containerized application-runtime comparison only if the benchmark harness needs tighter CPU or memory normalization
