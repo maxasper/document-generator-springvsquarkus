@@ -215,9 +215,77 @@ Interpretation limits:
 - Quarkus artifact size is measured from the packaged `quarkus-app/` directory
 - the first implementation is Linux-first for RSS and memory environment capture
 
+## Native Image Comparison
+
+Prerequisites:
+
+- Java `25`
+- Docker and Docker Compose
+- `curl`
+- `jq`
+- use `./mvnw` from the repository root
+- internet access on the first run so Docker and Maven can pull builder images, base images, and plugins
+- prefer a warm dependency cache in `.mvn/repository` and warm Docker image cache if you want the build-time metric to reflect native build work instead of first-time downloads
+
+The native benchmark scripts preserve the build path recommended by each framework instead of forcing a shared Dockerfile or a shared raw `native-image` invocation:
+
+- Spring Boot uses the Spring Boot native buildpacks path via `spring-boot:build-image`
+- Quarkus uses the Quarkus native container-build path to produce the native runner and then packages it with the Quarkus-style `Dockerfile.native-micro`
+
+The shared native benchmark contract is defined in:
+
+- `benchmarks/native-image-comparison-workload.json`
+- `benchmarks/native-image-comparison-report.schema.json`
+
+Run the Spring Boot native benchmark flow:
+
+```bash
+./scripts/benchmark-spring-native.sh
+```
+
+Run the Quarkus native benchmark flow:
+
+```bash
+./scripts/benchmark-quarkus-native.sh
+```
+
+Run the combined native comparison flow:
+
+```bash
+./scripts/benchmark-native-comparison.sh
+```
+
+The native benchmark flows all reuse the PostgreSQL-backed runtime path and add one extra safety step before measured benchmarking starts:
+
+1. build the selected native delivery artifact with the framework-native container build path
+2. start the produced native runtime container against the PostgreSQL benchmark baseline
+3. wait until `GET /api/v1/document-generations` returns `200`
+4. rerun the shared `document-generator-contract-tests` suite against that native runtime
+5. run warmup requests followed by measured generate and history requests
+6. capture steady-state container memory usage and write the machine-readable report
+
+Generated native benchmark output is written under `target/native-image-comparison/`.
+
+- `latest/` points to the most recent run directory
+- per-runtime flows emit one `report.json` plus `runtime.log`
+- the combined flow emits:
+  - `spring/report.json`
+  - `quarkus/report.json`
+  - `report.json`
+  - `summary.txt`
+
+Interpretation limits:
+
+- this is a local comparison harness, not a CI gate or production load test
+- compare results only across runs made on the same machine with similar background load
+- the native layer intentionally preserves framework-level build differences instead of flattening them into one shared Dockerfile
+- Spring Boot artifact size is measured from the produced OCI image built through buildpacks
+- Quarkus artifact size is measured from the produced OCI image built from the native runner and `Dockerfile.native-micro`
+- steady-state memory is measured as current Docker container memory usage, not as host-process RSS
+- build-time results depend heavily on Docker image cache state, dependency-cache warmth, and background host load
+
 ## Next Comparison Steps
 
-After the JVM-mode baseline stays green and stable, the next changes should focus on:
+After the native-image baseline stays green and stable, the next changes should focus on:
 
-1. native-image comparison using the same verified PostgreSQL-backed behavioral baseline
-2. containerized application-runtime comparison only if the benchmark harness needs tighter CPU or memory normalization
+1. containerized application-runtime comparison only if the benchmark harness needs tighter CPU or memory normalization

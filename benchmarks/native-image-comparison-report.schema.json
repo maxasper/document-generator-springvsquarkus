@@ -1,0 +1,221 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/document-generator/native-image-comparison-report.schema.json",
+    "title": "Native Image Comparison Report",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schemaVersion",
+        "benchmarkName",
+        "generatedAtUtc",
+        "workloadFile",
+        "environment",
+        "runs"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "type": "integer",
+            "const": 1
+        },
+        "benchmarkName": {
+            "type": "string",
+            "const": "native-image-comparison"
+        },
+        "generatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "workloadFile": {
+            "type": "string"
+        },
+        "environment": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "osName",
+                "osVersion",
+                "architecture",
+                "javaVersion",
+                "availableProcessors",
+                "totalMemoryKb",
+                "dockerVersion"
+            ],
+            "properties": {
+                "osName": {
+                    "type": "string"
+                },
+                "osVersion": {
+                    "type": "string"
+                },
+                "architecture": {
+                    "type": "string"
+                },
+                "javaVersion": {
+                    "type": "string"
+                },
+                "availableProcessors": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "totalMemoryKb": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "dockerVersion": {
+                    "type": "string"
+                }
+            }
+        },
+        "runs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "runtime",
+                    "mode",
+                    "baseUrl",
+                    "artifactReference",
+                    "outputDirectory",
+                    "buildStrategy",
+                    "contractVerification",
+                    "buildDurationMs",
+                    "artifactSizeBytes",
+                    "startupDurationMs",
+                    "steadyStateMemoryBytes",
+                    "generateLatencyMs",
+                    "historyLatencyMs"
+                ],
+                "properties": {
+                    "runtime": {
+                        "type": "string",
+                        "enum": [
+                            "spring",
+                            "quarkus"
+                        ]
+                    },
+                    "mode": {
+                        "type": "string",
+                        "const": "postgres"
+                    },
+                    "baseUrl": {
+                        "type": "string"
+                    },
+                    "artifactReference": {
+                        "type": "string"
+                    },
+                    "outputDirectory": {
+                        "type": "string"
+                    },
+                    "buildStrategy": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "kind",
+                            "buildCommand",
+                            "builderReference",
+                            "runtimeBaseImage",
+                            "artifactType",
+                            "artifactReference"
+                        ],
+                        "properties": {
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "spring-boot-buildpacks",
+                                    "quarkus-native-container-build"
+                                ]
+                            },
+                            "buildCommand": {
+                                "type": "string"
+                            },
+                            "builderReference": {
+                                "type": "string"
+                            },
+                            "runtimeBaseImage": {
+                                "type": "string"
+                            },
+                            "artifactType": {
+                                "type": "string",
+                                "const": "container-image"
+                            },
+                            "artifactReference": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "contractVerification": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "passed",
+                            "durationMs"
+                        ],
+                        "properties": {
+                            "passed": {
+                                "type": "boolean"
+                            },
+                            "durationMs": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    "buildDurationMs": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "artifactSizeBytes": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "startupDurationMs": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "steadyStateMemoryBytes": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "generateLatencyMs": {
+                        "$ref": "#/$defs/latencySummary"
+                    },
+                    "historyLatencyMs": {
+                        "$ref": "#/$defs/latencySummary"
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "latencySummary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "count",
+                "min",
+                "max",
+                "avg"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "min": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "max": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "avg": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        }
+    }
+}

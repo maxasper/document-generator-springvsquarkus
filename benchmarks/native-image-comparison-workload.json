@@ -1,0 +1,79 @@
+{
+    "schemaVersion": 1,
+    "benchmarkName": "native-image-comparison",
+    "runtimeMode": "postgres",
+    "artifact": {
+        "type": "container-image"
+    },
+    "memoryMeasurement": {
+        "kind": "docker-container-current-usage"
+    },
+    "output": {
+        "rootDirectory": "target/native-image-comparison",
+        "latestSymlinkName": "latest"
+    },
+    "readiness": {
+        "path": "/api/v1/document-generations",
+        "expectedStatus": 200,
+        "timeoutSeconds": 60
+    },
+    "warmup": {
+        "generateIterations": 3,
+        "historyIterations": 3
+    },
+    "measurement": {
+        "generateIterations": 5,
+        "historyIterations": 5
+    },
+    "requestTemplate": {
+        "documentFormat": "TXT",
+        "templateType": "INVOICE",
+        "documentNamePrefix": "native-benchmark-document",
+        "parameters": {
+            "customerName": "Acme Native Benchmark",
+            "invoiceNumberPrefix": "INV-NATIVE-BENCH",
+            "amount": "10"
+        }
+    },
+    "endpoints": {
+        "generate": {
+            "method": "POST",
+            "path": "/api/v1/document-generations",
+            "contentType": "application/json"
+        },
+        "history": {
+            "method": "GET",
+            "path": "/api/v1/document-generations"
+        }
+    },
+    "metrics": {
+        "buildStrategy": {
+            "kind": "Runtime-specific native build path identifier.",
+            "buildCommand": "Exact repository-local build command used to produce the native delivery artifact.",
+            "builderReference": "Builder image or builder entrypoint reference used by the runtime-specific native flow.",
+            "runtimeBaseImage": "Runtime base image reference when the delivery artifact is a container image.",
+            "artifactType": "Produced artifact type under comparison.",
+            "artifactReference": "Produced artifact reference under comparison."
+        },
+        "contractVerification": {
+            "passed": "Whether the shared runtime contract suite passed before measured benchmarking.",
+            "durationMs": "Duration of the shared contract-verification suite."
+        },
+        "buildDurationMs": "Duration required to produce the deployable native runtime artifact.",
+        "artifactSizeBytes": "Produced deployable native runtime artifact size in bytes.",
+        "startupDurationMs": "Time from native container launch until readiness endpoint returns 200.",
+        "steadyStateMemoryBytes": "Container memory usage in bytes after contract verification, warmup, and measured requests.",
+        "generateLatencyMs": {
+            "count": "Number of measured generate requests.",
+            "min": "Fastest measured generate request duration.",
+            "max": "Slowest measured generate request duration.",
+            "avg": "Average measured generate request duration."
+        },
+        "historyLatencyMs": {
+            "count": "Number of measured history requests.",
+            "min": "Fastest measured history request duration.",
+            "max": "Slowest measured history request duration.",
+            "avg": "Average measured history request duration."
+        }
+    }
+}
