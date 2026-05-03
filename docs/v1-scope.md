@@ -27,7 +27,7 @@ Deliver a small but complete service slice that proves the shared-core plus dual
 - asynchronous jobs or queue-based generation
 - update or delete history operations
 - advanced filtering, pagination, or search
-- native image tuning and performance benchmarking
+- native image tuning as part of the service contract; repository-level benchmarking is tracked separately from the v1 API scope
 
 ## Main Domain Concepts
 

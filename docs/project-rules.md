@@ -88,9 +88,9 @@ This document is the repository-local ruleset for this project. It adapts the im
 - Java `25` is the baseline until the repository intentionally moves to a newer LTS.
 - Checkstyle runs in `verify` with a small enforceable baseline from the repository root `checkstyle.xml`.
 - JaCoCo collects per-module coverage and aggregates it in `document-generator-quality-report/target/site/jacoco-aggregate`.
-- Container images should be built from runtime modules with Jib-family tooling instead of handwritten Dockerfiles once containerized comparison starts:
-  - Spring Boot runtime: `jib-maven-plugin`
-  - Quarkus runtime: Jib-based container-image path when that comparison layer is introduced
+- Container image workflows should stay explicit about framework differences instead of forcing a premature shared build path:
+  - manual JVM inspection currently uses runtime-local `Dockerfile.jvm` assets plus `docker build`
+  - native-image comparison preserves the framework-native build path for each runtime before packaging the runnable artifact
 - The repository keeps two runnable runtime modules on purpose, so there is no single canonical `bootstrap` artifact.
 
 ## 9. Minimal style baseline
@@ -117,4 +117,4 @@ This document is the repository-local ruleset for this project. It adapts the im
 - Explicit mapping between domain models and runtime-local transport/persistence models.
 - Testcontainers for future in-process integration tests that touch PostgreSQL or other external technologies.
 - Lombok carrier-model conventions if the repository later decides that plain Java has become too verbose.
-- Jib as the default image-build path once containerized Spring vs Quarkus comparison becomes part of the build.
+- Runtime-local image-build paths remain the default until the repository intentionally standardizes container packaging.

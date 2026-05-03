@@ -6,7 +6,7 @@ This repository hosts a spec-first demo for comparing Spring Boot and Quarkus wh
 
 - compare Spring Boot and Quarkus against the same service behavior and data model
 - keep one shared business core reused by both runtime applications
-- prepare for later JVM and native image comparison without changing domain logic
+- support JVM and native image comparison without changing domain logic
 
 ## Bounded V1 Scope
 
@@ -16,9 +16,9 @@ This repository hosts a spec-first demo for comparing Spring Boot and Quarkus wh
 - template type drives parameter validation rules
 - document generation is a stub in v1
 - generated file content is not stored in the database in v1
-- persistence is designed for PostgreSQL, but the first vertical slice may start with an in-memory adapter to prove boundaries quickly
+- persistence supports an in-memory baseline and a PostgreSQL-backed mode used by verification and comparison flows
 
-## Proposed Module Structure
+## Module Structure
 
 ```text
 document-generator-parent
@@ -39,7 +39,7 @@ document-generator-parent
 
 The initial decision is to keep HTTP and persistence adapters inside each runtime module. That keeps the framework comparison explicit and avoids premature abstractions in the first iteration.
 
-For the current Spring slice, the default mode is `in-memory`. A PostgreSQL-backed mode is prepared through the `postgres` Spring profile, which switches the repository adapter to JDBC and runs the SQL migration from `db/migration`.
+Both runtime applications keep `in-memory` as the default local mode and expose a PostgreSQL-backed `postgres` profile for verification, benchmarking, and manual container inspection. In PostgreSQL mode each runtime switches its repository adapter to JDBC and applies the runtime-local Flyway migration from `db/migration`.
 
 ## Repository Guide
 
@@ -54,9 +54,14 @@ For the current Spring slice, the default mode is `in-memory`. A PostgreSQL-back
 
 ## Spec-First Workflow
 
-The initial foundation change `establish-document-generator-foundation` is archived and its specs have been synced into `openspec/specs/`.
+Archived changes live under `openspec/changes/archive/`, and the current synced specification tree lives under `openspec/specs/`.
 
-The most recently completed change is `postgres-backed-runtime-verification`. It extends runtime verification from the initial `in-memory` baseline to a repeatable PostgreSQL-backed flow for Spring Boot and Quarkus before JVM and native-image comparison work.
+Recent archived changes cover:
+
+- PostgreSQL-backed runtime verification
+- JVM runtime comparison
+- native-image comparison
+- manual Compose-based JVM inspection, container resource limits, and repository-local load testing
 
 ## Maven Wrapper
 

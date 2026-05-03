@@ -1,4 +1,4 @@
-# Proposed Module Structure
+# Module Structure
 
 ## Principles
 
@@ -40,14 +40,14 @@ See [project-rules.md](project-rules.md) for the repository-wide rules used in t
 - Spring Boot main application
 - REST controller or controllers for generate and history endpoints
 - Spring-specific persistence adapter
-- future DB migration setup and runtime configuration
+- `in-memory` baseline mode plus `postgres` profile, JDBC wiring, and Flyway migration setup
 
 ### `document-generator-app-quarkus`
 
 - Quarkus main application
 - JAX-RS resource or resources for the same endpoints
 - Quarkus-specific persistence adapter
-- future DB migration setup and runtime configuration
+- `in-memory` baseline mode plus `postgres` profile, JDBC wiring, and Flyway migration setup
 
 ### `document-generator-contract-tests`
 
@@ -71,10 +71,10 @@ See [project-rules.md](project-rules.md) for the repository-wide rules used in t
   - Spring adapter: REST controller
   - Quarkus adapter: REST resource
 - outbound port `GenerationRequestRepository`
-  - early adapter: in-memory repository for the first thin slice
-  - later adapters: Spring PostgreSQL adapter and Quarkus PostgreSQL adapter
+  - default adapters: runtime-local in-memory repositories for the baseline local mode
+  - PostgreSQL adapters: Spring JDBC and Quarkus JDBC implementations activated by the `postgres` profile
 - outbound port `DocumentRenderer`
-  - initial shared adapter: stub renderer returning deterministic content
+  - current shared adapter: stub renderer returning deterministic content
 
 ## Why Persistence Stays Runtime-Local For Now
 
