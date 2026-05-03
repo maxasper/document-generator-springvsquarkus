@@ -1,0 +1,9 @@
+FROM eclipse-temurin:25-jre
+
+ARG QUARKUS_APP_DIR
+
+WORKDIR /app
+COPY ${QUARKUS_APP_DIR}/ /app/
+
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "/app/quarkus-run.jar"]

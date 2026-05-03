@@ -1,0 +1,9 @@
+FROM eclipse-temurin:25-jre
+
+ARG APP_JAR
+
+WORKDIR /app
+COPY ${APP_JAR} /app/application.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/application.jar"]

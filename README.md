@@ -284,6 +284,134 @@ Interpretation limits:
 - steady-state memory is measured as current Docker container memory usage, not as host-process RSS
 - build-time results depend heavily on Docker image cache state, dependency-cache warmth, and background host load
 
+## Manual JVM Container Inspection
+
+Prerequisites:
+
+- Java `25`
+- Docker and Docker Compose
+- `curl`
+- `jq`
+- use `./mvnw` from the repository root
+- a local JVM inspection tool if you want Java-level live diagnostics:
+  - `VisualVM`, or
+  - `JDK Mission Control`
+
+This workflow is intentionally JVM-only. It is meant for live Java inspection through JMX while the runtime stays online. Native-image containers remain outside this first manual-inspection slice because Java heap, thread, class, and GC tooling does not apply to them in the same way.
+
+Build the JVM container image for one runtime:
+
+```bash
+./scripts/build-compose-runtime-image.sh spring
+./scripts/build-compose-runtime-image.sh quarkus
+```
+
+Start Spring Boot manually in Compose:
+
+```bash
+./scripts/run-compose-spring-jvm.sh
+```
+
+Start Quarkus manually in Compose:
+
+```bash
+./scripts/run-compose-quarkus-jvm.sh
+```
+
+The manual Compose runtime workflow:
+
+1. recreates the PostgreSQL-backed local environment from `compose.runtime-inspection.yml`
+2. starts one JVM runtime container in PostgreSQL-backed mode
+3. waits until `GET /api/v1/document-generations` returns `200`
+4. keeps the runtime online for manual inspection and follow-up load testing
+
+Default host endpoints:
+
+- Spring Boot HTTP: `http://localhost:18080`
+- Spring Boot JMX: `service:jmx:rmi:///jndi/rmi://127.0.0.1:9010/jmxrmi`
+- Quarkus HTTP: `http://localhost:18081`
+- Quarkus JMX: `service:jmx:rmi:///jndi/rmi://127.0.0.1:9011/jmxrmi`
+
+Useful local inspection views:
+
+- Java-level live diagnostics: connect `VisualVM` or `JDK Mission Control` to the runtime JMX endpoint
+- Container-level resource view: `docker stats`
+
+Resource-limit controls are applied through Docker Compose env vars before startup:
+
+```bash
+DG_RUNTIME_CPUS=1.5 \
+DG_RUNTIME_MEMORY=512m \
+DG_RUNTIME_PIDS_LIMIT=256 \
+DG_RUNTIME_MAX_RAM_PERCENTAGE=75.0 \
+./scripts/run-compose-spring-jvm.sh
+```
+
+Supported limit knobs:
+
+- `DG_RUNTIME_CPUS`: Docker CPU quota for the selected runtime container
+- `DG_RUNTIME_MEMORY`: Docker memory limit for the selected runtime container
+- `DG_RUNTIME_PIDS_LIMIT`: process-count limit for the selected runtime container
+- `DG_RUNTIME_MAX_RAM_PERCENTAGE`: JVM heap sizing cap relative to the container memory limit
+
+Run the repository-local load test against the active runtime:
+
+```bash
+./scripts/load-test-spring-compose.sh
+./scripts/load-test-quarkus-compose.sh
+```
+
+The shared load-test workload is defined in:
+
+- `benchmarks/runtime-load-testing-workload.json`
+
+Generated load-test output is written under `target/runtime-load-testing/`.
+
+- `latest/` points to the most recent run directory
+- each runtime run emits:
+  - `summary.json`
+  - `summary.txt`
+  - `k6.log`
+
+The default load-test profile uses containerized `k6`, so no host installation is required. You can override the default VUs and duration per run:
+
+```bash
+LOAD_TEST_VUS=20 \
+LOAD_TEST_DURATION=45s \
+./scripts/load-test-spring-compose.sh
+```
+
+Validated local sessions on `2026-05-03`:
+
+- Spring Boot:
+  - build: `./scripts/build-compose-runtime-image.sh spring`
+  - startup: `./scripts/run-compose-spring-jvm.sh`
+  - applied default limits: `768m`, `2.0 CPU`, `256` PIDs
+  - load test: `./scripts/load-test-spring-compose.sh`
+  - validated artifact dir: `target/runtime-load-testing/20260503T095933Z-spring/`
+  - observed summary: `532` requests, `0` failures, `73.34ms` average latency, `178.21ms` p95 latency
+- Quarkus:
+  - build: `./scripts/build-compose-runtime-image.sh quarkus`
+  - startup: `DG_RUNTIME_CPUS=1.5 DG_RUNTIME_MEMORY=512m DG_RUNTIME_PIDS_LIMIT=256 DG_RUNTIME_MAX_RAM_PERCENTAGE=75.0 ./scripts/run-compose-quarkus-jvm.sh`
+  - applied override limits: `512m`, `1.5 CPU`, `256` PIDs, `MaxRAMPercentage=75.0`
+  - load test: `./scripts/load-test-quarkus-compose.sh`
+  - validated artifact dir: `target/runtime-load-testing/20260503T113216Z-quarkus/`
+  - observed summary: `580` requests, `0` failures, `31.14ms` average latency, `60.09ms` p95 latency
+
+Stop and clean the manual runtime environment:
+
+```bash
+./scripts/compose-runtime-down.sh
+```
+
+Interpretation limits:
+
+- this is an interactive local operator workflow, not a production-grade monitoring stack
+- compare results only across runs made on the same machine and under similar background load
+- JMX is configured for local-only use with authentication and SSL disabled; do not reuse these settings in shared or remote environments
+- container limits affect JVM behavior, so compare Spring Boot and Quarkus only under the same `DG_RUNTIME_*` settings
+- this workflow complements the existing JVM and native benchmark scripts; it does not replace them
+
 ## Next Comparison Steps
 
 After the native-image baseline stays green and stable, the next changes should focus on:

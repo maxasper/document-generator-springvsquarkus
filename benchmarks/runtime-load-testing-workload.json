@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "workloadName": "runtime-load-testing",
+    "output": {
+        "rootDirectory": "target/runtime-load-testing",
+        "latestSymlinkName": "latest"
+    },
+    "loadProfile": {
+        "vus": 10,
+        "duration": "30s"
+    },
+    "thresholds": {
+        "http_req_failed": [
+            "rate<0.01"
+        ],
+        "http_req_duration": [
+            "p(95)<500"
+        ]
+    },
+    "requestTemplate": {
+        "documentFormat": "TXT",
+        "templateType": "INVOICE",
+        "documentNamePrefix": "compose-load-test-document",
+        "parameters": {
+            "customerName": "Acme Compose Load Test",
+            "invoiceNumberPrefix": "INV-COMPOSE-LOAD",
+            "amount": "10"
+        }
+    },
+    "endpoints": {
+        "generate": {
+            "method": "POST",
+            "path": "/api/v1/document-generations",
+            "contentType": "application/json"
+        },
+        "history": {
+            "method": "GET",
+            "path": "/api/v1/document-generations"
+        }
+    }
+}
