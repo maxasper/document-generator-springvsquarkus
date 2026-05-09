@@ -1,0 +1,24 @@
+schema: spec-driven
+context: |
+  Project: Document Generator Service demo comparing Spring Boot and Quarkus over the same business core.
+  Stack: Java 25, Maven multi-module, PostgreSQL target, hexagonal architecture.
+  Constraints:
+  - domain and application layers must stay free from framework dependencies
+  - Spring Boot and Quarkus must be separate runnable modules
+  - framework-specific code belongs only in adapters and integration layers
+  - v1 prioritizes clean boundaries and a reproducible comparison over rich document rendering
+  - generated file content must not be stored in the database in v1
+  Working style:
+  - prefer small incremental changes that can be implemented in separate Codex turns
+  - keep documentation concise, concrete, and aligned with the comparison goal
+  - choose simple defaults before introducing abstractions
+rules:
+  proposal:
+    - Keep the proposal centered on the shared-core plus dual-runtime comparison goal.
+  specs:
+    - Use concrete API paths and request or response expectations when they affect behavior.
+    - Limit requirements to v1 behavior and architectural obligations needed for the next implementation slices.
+  design:
+    - Include proposed Maven modules, primary ports, adapters, assumptions, and deferred decisions.
+  tasks:
+    - Break work into small end-to-end slices that can be delivered and verified independently.
