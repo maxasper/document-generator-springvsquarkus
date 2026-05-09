@@ -104,10 +104,10 @@ Combined runs emit:
 - steady-state memory is measured as current Docker container memory usage rather than host-process RSS
 - build-time results depend heavily on Docker image cache state, dependency-cache warmth, and background host load
 
-## Important Difference From Manual JVM Inspection
+## Important Difference From Manual Container Inspection
 
 - this workflow does not use `compose.runtime-inspection.yml`
 - this workflow does not consume the manual inspection `DG_RUNTIME_CPUS`, `DG_RUNTIME_MEMORY`, `DG_RUNTIME_PIDS_LIMIT`, or `DG_RUNTIME_MAX_RAM_PERCENTAGE` controls
 - the reported native memory value is observed container memory usage from `docker stats`, not a fixed manual container limit
 
-If you want manual container limits, JMX inspection, or repository-local `k6` load testing, use [manual-runtime-inspection.md](manual-runtime-inspection.md) instead.
+If you want manual container limits, optional JMX inspection for JVM scenarios, or repository-local `k6` load testing, use [manual-container-runtime-inspection.md](manual-container-runtime-inspection.md) instead.

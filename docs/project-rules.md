@@ -89,7 +89,7 @@ This document is the repository-local ruleset for this project. It adapts the im
 - Checkstyle runs in `verify` with a small enforceable baseline from the repository root `checkstyle.xml`.
 - JaCoCo collects per-module coverage and aggregates it in `document-generator-quality-report/target/site/jacoco-aggregate`.
 - Container image workflows should stay explicit about framework differences instead of forcing a premature shared build path:
-  - manual JVM inspection currently uses runtime-local `Dockerfile.jvm` assets plus `docker build`
+  - manual container inspection currently uses runtime-local Docker assets plus `docker build` or framework-native image build paths, depending on the selected runtime mode
   - native-image comparison preserves the framework-native build path for each runtime before packaging the runnable artifact
 - The repository keeps two runnable runtime modules on purpose, so there is no single canonical `bootstrap` artifact.
 

@@ -1,0 +1,192 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Container Runtime Matrix Report",
+    "type": "object",
+    "required": [
+        "schemaVersion",
+        "benchmarkName",
+        "generatedAtUtc",
+        "workloadFile",
+        "loadTestWorkloadFile",
+        "environment",
+        "configuredLimits",
+        "configuredLoadProfile",
+        "runs"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "const": 1
+        },
+        "benchmarkName": {
+            "const": "container-runtime-matrix"
+        },
+        "generatedAtUtc": {
+            "type": "string"
+        },
+        "workloadFile": {
+            "type": "string"
+        },
+        "loadTestWorkloadFile": {
+            "type": "string"
+        },
+        "environment": {
+            "type": "object"
+        },
+        "configuredLimits": {
+            "type": "object",
+            "required": [
+                "cpus",
+                "memory",
+                "pidsLimit",
+                "jvmMaxRamPercentage"
+            ],
+            "properties": {
+                "cpus": {
+                    "type": "string"
+                },
+                "memory": {
+                    "type": "string"
+                },
+                "pidsLimit": {
+                    "type": "integer"
+                },
+                "jvmMaxRamPercentage": {
+                    "type": "string"
+                }
+            }
+        },
+        "configuredLoadProfile": {
+            "type": "object",
+            "required": [
+                "vus",
+                "duration"
+            ],
+            "properties": {
+                "vus": {
+                    "type": "integer"
+                },
+                "duration": {
+                    "type": "string"
+                }
+            }
+        },
+        "runs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "scenario",
+                    "runtime",
+                    "mode",
+                    "displayName",
+                    "buildStrategy",
+                    "image",
+                    "buildDurationMs",
+                    "startupDurationMs",
+                    "containerObservation",
+                    "loadTest"
+                ],
+                "properties": {
+                    "scenario": {
+                        "type": "string"
+                    },
+                    "runtime": {
+                        "type": "string",
+                        "enum": [
+                            "spring",
+                            "quarkus"
+                        ]
+                    },
+                    "mode": {
+                        "type": "string",
+                        "enum": [
+                            "jvm",
+                            "native"
+                        ]
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "buildStrategy": {
+                        "type": "object",
+                        "required": [
+                            "kind"
+                        ],
+                        "properties": {
+                            "kind": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "image": {
+                        "type": "object",
+                        "required": [
+                            "reference",
+                            "sizeBytes"
+                        ],
+                        "properties": {
+                            "reference": {
+                                "type": "string"
+                            },
+                            "sizeBytes": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "buildDurationMs": {
+                        "type": "integer"
+                    },
+                    "startupDurationMs": {
+                        "type": "integer"
+                    },
+                    "containerObservation": {
+                        "type": "object",
+                        "required": [
+                            "memoryBytes",
+                            "cpuPercent"
+                        ],
+                        "properties": {
+                            "memoryBytes": {
+                                "type": "integer"
+                            },
+                            "cpuPercent": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "loadTest": {
+                        "type": "object",
+                        "required": [
+                            "outputDir",
+                            "iterations",
+                            "httpReqs",
+                            "httpReqFailedRate",
+                            "avgDurationMs",
+                            "p95DurationMs"
+                        ],
+                        "properties": {
+                            "outputDir": {
+                                "type": "string"
+                            },
+                            "iterations": {
+                                "type": "integer"
+                            },
+                            "httpReqs": {
+                                "type": "integer"
+                            },
+                            "httpReqFailedRate": {
+                                "type": "number"
+                            },
+                            "avgDurationMs": {
+                                "type": "number"
+                            },
+                            "p95DurationMs": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

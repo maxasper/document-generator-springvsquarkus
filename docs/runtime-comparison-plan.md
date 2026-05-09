@@ -9,7 +9,8 @@ Detailed operator procedures now live in dedicated workflow guides:
 - [docs/testing/runtime-verification.md](testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](testing/jvm-runtime-comparison.md)
 - [docs/testing/native-image-comparison.md](testing/native-image-comparison.md)
-- [docs/testing/manual-runtime-inspection.md](testing/manual-runtime-inspection.md)
+- [docs/testing/manual-container-runtime-inspection.md](testing/manual-container-runtime-inspection.md)
+- [docs/testing/container-runtime-matrix-comparison.md](testing/container-runtime-matrix-comparison.md)
 
 This document keeps comparison context, metric interpretation, and reporting notes rather than duplicating the runbook steps from those guides.
 
@@ -66,7 +67,7 @@ Interpretation limits for the current native harness:
 - memory is measured as current Docker container memory usage rather than host-process RSS
 - native benchmark runs do not use the manual inspection `DG_RUNTIME_*` container-limit controls
 
-## Manual JVM Container Evaluation
+## Manual Container Runtime Evaluation
 
 Current runtime-inspection assets:
 
@@ -74,19 +75,41 @@ Current runtime-inspection assets:
 - load-test workload: `benchmarks/runtime-load-testing-workload.json`
 - generated load-test output root: `target/runtime-load-testing/`
 
-Current manual JVM evaluation capabilities:
+Current manual container evaluation capabilities:
 
-- start PostgreSQL plus one selected JVM runtime container
-- attach a local JVM tool through JMX for live inspection
+- start PostgreSQL plus one selected JVM or native runtime container
+- attach a local JVM tool through JMX for the JVM scenarios
 - constrain CPU, memory, and PID count through documented Compose env vars
 - run a repository-local `k6` load test while the runtime stays online
 
-Interpretation limits for the current manual JVM evaluation flow:
+Interpretation limits for the current manual container evaluation flow:
 
 - it is an interactive operator workflow, not a replacement for the unattended benchmark scripts
-- VisualVM, JDK Mission Control, and JMX-based diagnostics apply to JVM containers only
+- VisualVM, JDK Mission Control, and JMX-based diagnostics apply to JVM scenarios only
 - container resource limits and JVM memory flags must stay equivalent across Spring Boot and Quarkus if the results are compared
-- native-image container observability remains deferred to a later change
+
+## Container Runtime Matrix Comparison
+
+Current automated container-matrix assets:
+
+- matrix workload: `benchmarks/container-runtime-matrix-workload.json`
+- shared load-test workload: `benchmarks/runtime-load-testing-workload.json`
+- machine-readable report shape: `benchmarks/container-runtime-matrix-report.schema.json`
+- generated output root: `target/container-runtime-matrix/`
+
+Current automated container-matrix capabilities:
+
+- build and start `spring-jvm`, `quarkus-jvm`, `spring-native`, and `quarkus-native` sequentially
+- reuse the same `DG_RUNTIME_*` resource controls across the full four-scenario run
+- reuse the same `LOAD_TEST_*` profile across the full four-scenario run
+- write scenario-level startup and runtime logs plus a combined summary table
+
+Interpretation limits for the current container-matrix flow:
+
+- it is a local developer workflow, not a CI gate or production load test
+- the PostgreSQL baseline is recreated between scenarios
+- native scenarios are compared through container-level metrics and load-test output rather than JVM-level diagnostics
+- Spring Boot and Quarkus intentionally keep different native image build strategies
 
 ## Reporting
 

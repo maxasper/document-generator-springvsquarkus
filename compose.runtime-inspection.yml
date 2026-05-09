@@ -46,6 +46,25 @@ services:
     mem_limit: "${DG_RUNTIME_MEMORY:-768m}"
     pids_limit: ${DG_RUNTIME_PIDS_LIMIT:-256}
 
+  spring-native:
+    image: document-generator-spring-native-inspection:latest
+    container_name: document-generator-spring-native-inspection
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DOCUMENT_GENERATOR_POSTGRES_HOST: postgres
+      DOCUMENT_GENERATOR_POSTGRES_PORT: 5432
+      DOCUMENT_GENERATOR_POSTGRES_DATABASE: document_generator
+      DOCUMENT_GENERATOR_POSTGRES_USER: document_generator
+      DOCUMENT_GENERATOR_POSTGRES_PASSWORD: document_generator
+    ports:
+      - "18080:8080"
+    cpus: "${DG_RUNTIME_CPUS:-2.0}"
+    mem_limit: "${DG_RUNTIME_MEMORY:-768m}"
+    pids_limit: ${DG_RUNTIME_PIDS_LIMIT:-256}
+
   quarkus-jvm:
     image: document-generator-quarkus-jvm-inspection:latest
     container_name: document-generator-quarkus-jvm-inspection
@@ -76,10 +95,29 @@ services:
     mem_limit: "${DG_RUNTIME_MEMORY:-768m}"
     pids_limit: ${DG_RUNTIME_PIDS_LIMIT:-256}
 
+  quarkus-native:
+    image: document-generator-quarkus-native-inspection:latest
+    container_name: document-generator-quarkus-native-inspection
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      QUARKUS_PROFILE: postgres
+      DOCUMENT_GENERATOR_POSTGRES_HOST: postgres
+      DOCUMENT_GENERATOR_POSTGRES_PORT: 5432
+      DOCUMENT_GENERATOR_POSTGRES_DATABASE: document_generator
+      DOCUMENT_GENERATOR_POSTGRES_USER: document_generator
+      DOCUMENT_GENERATOR_POSTGRES_PASSWORD: document_generator
+    ports:
+      - "18081:8081"
+    cpus: "${DG_RUNTIME_CPUS:-2.0}"
+    mem_limit: "${DG_RUNTIME_MEMORY:-768m}"
+    pids_limit: ${DG_RUNTIME_PIDS_LIMIT:-256}
+
   k6:
     image: grafana/k6:0.49.0
     user: "0:0"
     working_dir: /workspace
     volumes:
       - .:/workspace:ro
-      - ./target/runtime-load-testing:/results
+      - ./target:/results

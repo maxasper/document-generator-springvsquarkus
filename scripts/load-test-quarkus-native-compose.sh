@@ -2,4 +2,4 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-"$script_dir/load-test-spring-jvm-compose.sh" "$@"
+"$script_dir/load-test-compose-runtime.sh" quarkus native "$@"

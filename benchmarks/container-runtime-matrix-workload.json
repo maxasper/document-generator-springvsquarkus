@@ -1,0 +1,30 @@
+{
+    "schemaVersion": 1,
+    "benchmarkName": "container-runtime-matrix",
+    "output": {
+        "rootDirectory": "target/container-runtime-matrix",
+        "latestSymlinkName": "latest"
+    },
+    "timeouts": {
+        "buildSeconds": 1800,
+        "startupSeconds": 120
+    },
+    "scenarios": [
+        {
+            "runtime": "spring",
+            "mode": "jvm"
+        },
+        {
+            "runtime": "quarkus",
+            "mode": "jvm"
+        },
+        {
+            "runtime": "spring",
+            "mode": "native"
+        },
+        {
+            "runtime": "quarkus",
+            "mode": "native"
+        }
+    ]
+}

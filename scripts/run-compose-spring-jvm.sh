@@ -2,4 +2,4 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-"$script_dir/compose-runtime-up.sh" spring
+"$script_dir/compose-runtime-up.sh" spring jvm

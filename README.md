@@ -52,7 +52,8 @@ Both runtime applications keep `in-memory` as the default local mode and expose 
 - [docs/testing/runtime-verification.md](docs/testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](docs/testing/jvm-runtime-comparison.md)
 - [docs/testing/native-image-comparison.md](docs/testing/native-image-comparison.md)
-- [docs/testing/manual-runtime-inspection.md](docs/testing/manual-runtime-inspection.md)
+- [docs/testing/manual-container-runtime-inspection.md](docs/testing/manual-container-runtime-inspection.md)
+- [docs/testing/container-runtime-matrix-comparison.md](docs/testing/container-runtime-matrix-comparison.md)
 - [openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md](openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md)
 - [openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md](openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md)
 
@@ -65,7 +66,7 @@ Recent archived changes cover:
 - PostgreSQL-backed runtime verification
 - JVM runtime comparison
 - native-image comparison
-- manual Compose-based JVM inspection, container resource limits, and repository-local load testing
+- manual Compose-based container inspection, container resource limits, and repository-local load testing
 
 ## Maven Wrapper
 
@@ -109,7 +110,9 @@ Use the dedicated workflow guides under `docs/testing/` depending on what you wa
   - repository-local JVM benchmark flows and generated report layout
 - [Native Image Comparison](docs/testing/native-image-comparison.md)
   - repository-local native benchmark flows and native-specific interpretation limits
-- [Manual JVM Runtime Inspection](docs/testing/manual-runtime-inspection.md)
-  - Compose-based PostgreSQL plus one JVM runtime, JMX inspection, container limits, and repository-local `k6` load testing
+- [Manual Container Runtime Inspection](docs/testing/manual-container-runtime-inspection.md)
+  - Compose-based PostgreSQL plus one selected JVM or native runtime, optional JMX for JVM scenarios, container limits, and repository-local `k6` load testing
+- [Container Runtime Matrix Comparison](docs/testing/container-runtime-matrix-comparison.md)
+  - unattended Docker-to-Docker comparison across `spring/quarkus x jvm/native` under one shared limit and load profile
 
 For comparison framing, metric interpretation, and reporting conventions across these workflows, see [docs/runtime-comparison-plan.md](docs/runtime-comparison-plan.md).

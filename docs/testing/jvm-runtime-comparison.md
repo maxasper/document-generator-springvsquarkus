@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use this workflow when you want to benchmark Spring Boot and Quarkus in JVM mode against the same PostgreSQL-backed baseline.
+Use this workflow when you want to benchmark Spring Boot and Quarkus in JVM mode as host-run Java processes against the same PostgreSQL-backed baseline.
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ Each JVM benchmark run:
 
 1. packages the selected runtime and its dependencies
 2. recreates the PostgreSQL benchmark baseline from `compose.postgres-verification.yml`
-3. starts the runtime in PostgreSQL-backed mode on `http://localhost:18080` or `http://localhost:18081`
+3. starts the runtime on the host in PostgreSQL-backed mode on `http://localhost:18080` or `http://localhost:18081`
 4. waits for `GET /api/v1/document-generations` to return `200`
 5. performs warmup generate and history requests
 6. records build duration, packaged artifact size, cold startup, steady-state RSS, and measured endpoint latency
@@ -89,6 +89,7 @@ Combined runs emit:
 ## Interpretation Limits
 
 - this is a local developer benchmark, not a CI gate or production load test
+- this is a host-process comparison workflow; it is intentionally separate from the containerized runtime matrix comparison
 - compare runs only on the same machine and under similar background load
 - the PostgreSQL baseline is recreated between Spring Boot and Quarkus runs
 - Spring Boot artifact size is measured from the packaged fat jar

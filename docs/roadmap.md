@@ -40,5 +40,5 @@
 
 ## 8. Current State
 
-- the repository now supports contract verification, JVM comparison, native-image comparison, and manual JVM container inspection against the same PostgreSQL-backed baseline
+- the repository now supports contract verification, host JVM comparison, native-image comparison, manual container runtime inspection, and automated container runtime matrix comparison against the same PostgreSQL-backed baseline
 - future work should be described as new changes in `openspec/` rather than inferred from this completed milestone list
