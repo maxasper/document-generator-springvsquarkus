@@ -4,8 +4,9 @@ These tasks start after Spring Boot and Quarkus are functionally aligned, pass t
 
 ## Workflow Guides
 
-Detailed operator procedures now live in dedicated workflow guides:
+The overview and detailed operator procedures now live in these documents:
 
+- [docs/testing/benchmark-architecture.md](testing/benchmark-architecture.md)
 - [docs/testing/runtime-verification.md](testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](testing/jvm-runtime-comparison.md)
 - [docs/testing/native-image-comparison.md](testing/native-image-comparison.md)

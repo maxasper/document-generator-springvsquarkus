@@ -49,6 +49,7 @@ Both runtime applications keep `in-memory` as the default local mode and expose 
 - [docs/roadmap.md](docs/roadmap.md)
 - [docs/risks-and-open-questions.md](docs/risks-and-open-questions.md)
 - [docs/runtime-comparison-plan.md](docs/runtime-comparison-plan.md)
+- [docs/testing/benchmark-architecture.md](docs/testing/benchmark-architecture.md)
 - [docs/testing/runtime-verification.md](docs/testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](docs/testing/jvm-runtime-comparison.md)
 - [docs/testing/native-image-comparison.md](docs/testing/native-image-comparison.md)
@@ -102,8 +103,10 @@ The quality baseline is intentionally shared across Spring Boot and Quarkus so t
 
 ## Testing And Benchmarking
 
-Use the dedicated workflow guides under `docs/testing/` depending on what you want to run:
+Use the overview and workflow guides under `docs/testing/` depending on what you want to run:
 
+- [Benchmark Architecture](docs/testing/benchmark-architecture.md)
+  - overview of the repository's verification, host-JVM benchmark, native benchmark, manual container inspection, and container-matrix flows
 - [Runtime Verification](docs/testing/runtime-verification.md)
   - shared contract verification for Spring Boot and Quarkus in `in-memory` and PostgreSQL-backed modes
 - [JVM Runtime Comparison](docs/testing/jvm-runtime-comparison.md)
