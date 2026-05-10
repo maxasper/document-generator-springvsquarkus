@@ -10,6 +10,7 @@ import com.example.documentgenerator.spring.repository.InMemoryGenerationRequest
 import com.example.documentgenerator.spring.repository.jdbc.JdbcGenerationRequestRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.migration.JavaMigration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,7 +53,10 @@ public class DocumentGeneratorConfiguration {
     Flyway flyway(DataSource dataSource) {
         return Flyway.configure()
                 .dataSource(dataSource)
-                .locations("classpath:db/migration")
+                .resourceProvider(
+                        new FlywayMigrationResourceProvider(DocumentGeneratorConfiguration.class.getClassLoader())
+                )
+                .javaMigrationClassProvider(() -> java.util.List.<Class<? extends JavaMigration>>of())
                 .load();
     }
 

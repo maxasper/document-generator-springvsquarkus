@@ -52,6 +52,13 @@ The repository SHALL document native manual runtime inspection through container
 - **WHEN** a developer starts a supported runtime through the documented Compose flow in `native` mode
 - **THEN** the workflow directs the developer to observe logs and container metrics for that native process rather than expecting JVM JMX attachment
 
+### Requirement: Manual Spring Boot native inspection image is a real native container
+The repository SHALL build the shared `spring-native` inspection image as a true Spring Boot native executable container so manual Compose inspection does not observe a mislabeled JVM scenario.
+
+#### Scenario: Manual Spring Boot native image uses the native buildpacks toggle
+- **WHEN** a developer builds the Spring Boot `native` inspection image through the documented repository-local build command
+- **THEN** the build enables the Spring Boot native buildpacks mode required to produce a native executable image
+
 ### Requirement: Dedicated manual container inspection guide is linked from the repository entrypoint
 The repository SHALL surface the documented manual container runtime inspection flow through a dedicated workflow guide linked from `README.md`.
 

@@ -57,7 +57,7 @@ jq -s \
 
 {
     echo "Container runtime matrix summary"
-    printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s\n" "scenario" "build(ms)" "startup(ms)" "memory(bytes)" "cpu(%)" "reqs" "failed" "p95(ms)"
+    printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s %-10s\n" "scenario" "build(ms)" "startup(ms)" "memory(bytes)" "cpu(%)" "reqs" "failed" "p95(ms)" "p95_ok(ms)"
     jq -r '
         .runs[]
         | [
@@ -68,12 +68,13 @@ jq -s \
             (.containerObservation.cpuPercent | tostring),
             (.loadTest.httpReqs | tostring),
             (.loadTest.httpReqFailedRate | tostring),
-            (.loadTest.p95DurationMs | tostring)
+            (.loadTest.p95DurationMs | tostring),
+            (.loadTest.successfulP95DurationMs // .loadTest.p95DurationMs | tostring)
         ]
         | @tsv
-    ' "$report_file" | while IFS=$'\t' read -r scenario build startup memory_bytes cpu reqs failed p95; do
-        printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s\n" \
-            "$scenario" "$build" "$startup" "$memory_bytes" "$cpu" "$reqs" "$failed" "$p95"
+    ' "$report_file" | while IFS=$'\t' read -r scenario build startup memory_bytes cpu reqs failed p95 successful_p95; do
+        printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s %-10s\n" \
+            "$scenario" "$build" "$startup" "$memory_bytes" "$cpu" "$reqs" "$failed" "$p95" "$successful_p95"
     done
 } >"$summary_file"
 

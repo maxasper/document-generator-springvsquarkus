@@ -83,12 +83,23 @@ mkdir -p "$repo_root/target"
 
 cd "$repo_root"
 
+set +e
 docker compose -f "$compose_runtime_compose_file" run --rm -T --no-deps \
     -e "BASE_URL=$base_url" \
     -e "LOAD_TEST_VUS=$vus" \
     -e "LOAD_TEST_DURATION=$duration" \
     k6 run /workspace/scripts/runtime-load-test.js \
     --summary-export "/results/${results_relative_path}/summary.json" >"$log_file" 2>&1
+k6_exit_code=$?
+set -e
+
+if [[ $k6_exit_code -ne 0 ]]; then
+    if [[ -f "$summary_file" ]] && grep -q "thresholds on metrics .* have been crossed" "$log_file"; then
+        echo "k6 thresholds were crossed; preserving benchmark summary and continuing." >>"$log_file"
+    else
+        exit "$k6_exit_code"
+    fi
+fi
 
 jq -r \
     --arg runtime "$runtime" \
@@ -109,7 +120,9 @@ jq -r \
         "http_reqs=\(.metrics.http_reqs.count // 0)",
         "http_req_failed(rate)=\(.metrics.http_req_failed.value // 0)",
         "http_req_duration(avg)=\(.metrics.http_req_duration.avg // 0)ms",
-        "http_req_duration(p95)=\(.metrics.http_req_duration["p(95)"] // 0)ms"
+        "http_req_duration(p95)=\(.metrics.http_req_duration["p(95)"] // 0)ms",
+        "http_req_duration_successful(avg)=\(.metrics["http_req_duration{expected_response:true}"].avg // 0)ms",
+        "http_req_duration_successful(p95)=\(.metrics["http_req_duration{expected_response:true}"]["p(95)"] // 0)ms"
     ] | .[]' "$summary_file" >"$summary_text_file"
 
 echo "Load test complete for $(compose_runtime_scenario_display_name "$runtime" "$mode")"

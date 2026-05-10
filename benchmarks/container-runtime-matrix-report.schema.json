@@ -151,6 +151,18 @@
                             },
                             "cpuPercent": {
                                 "type": "number"
+                            },
+                            "startupMemoryBytes": {
+                                "type": "integer"
+                            },
+                            "startupCpuPercent": {
+                                "type": "number"
+                            },
+                            "postLoadMemoryBytes": {
+                                "type": "integer"
+                            },
+                            "postLoadCpuPercent": {
+                                "type": "number"
                             }
                         }
                     },
@@ -181,6 +193,12 @@
                                 "type": "number"
                             },
                             "p95DurationMs": {
+                                "type": "number"
+                            },
+                            "successfulAvgDurationMs": {
+                                "type": "number"
+                            },
+                            "successfulP95DurationMs": {
                                 "type": "number"
                             }
                         }

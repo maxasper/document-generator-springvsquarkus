@@ -182,6 +182,13 @@
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-maven-plugin</artifactId>
                             <version>${spring-boot.version}</version>
+                            <configuration>
+                                <image>
+                                    <env>
+                                        <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                    </env>
+                                </image>
+                            </configuration>
                             <executions>
                                 <execution>
                                     <id>process-aot</id>

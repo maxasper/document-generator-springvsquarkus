@@ -60,6 +60,10 @@ startup_duration_ms=0
 image_size_bytes=0
 memory_bytes=0
 cpu_percent=0
+startup_memory_bytes=0
+startup_cpu_percent=0
+post_load_memory_bytes=0
+post_load_cpu_percent=0
 
 cleanup() {
     local exit_code=$?
@@ -99,10 +103,23 @@ if [[ -z "$runtime_container_id" ]]; then
     exit 1
 fi
 
+startup_memory_bytes="$(compose_runtime_container_memory_bytes "$runtime_container_id")"
+startup_cpu_percent="$(compose_runtime_container_cpu_percent "$runtime_container_id")"
+
 "$script_dir/load-test-compose-runtime.sh" "$runtime" "$mode" "$load_test_output_dir"
 
-memory_bytes="$(compose_runtime_container_memory_bytes "$runtime_container_id")"
-cpu_percent="$(compose_runtime_container_cpu_percent "$runtime_container_id")"
+post_load_memory_bytes="$(compose_runtime_container_memory_bytes "$runtime_container_id")"
+post_load_cpu_percent="$(compose_runtime_container_cpu_percent "$runtime_container_id")"
+memory_bytes="$post_load_memory_bytes"
+cpu_percent="$post_load_cpu_percent"
+
+if [[ "$memory_bytes" -eq 0 && "$startup_memory_bytes" -gt 0 ]]; then
+    memory_bytes="$startup_memory_bytes"
+fi
+
+if [[ "$cpu_percent" == "0" || "$cpu_percent" == "0.00" ]]; then
+    cpu_percent="$startup_cpu_percent"
+fi
 
 load_test_summary_file="$load_test_output_dir/summary.json"
 if [[ ! -f "$load_test_summary_file" ]]; then
@@ -135,6 +152,10 @@ jq -n \
     --argjson pids_limit "$(compose_runtime_configured_pids_limit)" \
     --argjson memory_bytes "$memory_bytes" \
     --argjson cpu_percent "${cpu_percent:-0}" \
+    --argjson startup_memory_bytes "$startup_memory_bytes" \
+    --argjson startup_cpu_percent "${startup_cpu_percent:-0}" \
+    --argjson post_load_memory_bytes "$post_load_memory_bytes" \
+    --argjson post_load_cpu_percent "${post_load_cpu_percent:-0}" \
     --slurpfile load_summary "$load_test_summary_file" \
     '{
         schemaVersion: 1,
@@ -171,7 +192,11 @@ jq -n \
             runtimeLog: $runtime_log_file,
             containerObservation: {
                 memoryBytes: $memory_bytes,
-                cpuPercent: $cpu_percent
+                cpuPercent: $cpu_percent,
+                startupMemoryBytes: $startup_memory_bytes,
+                startupCpuPercent: $startup_cpu_percent,
+                postLoadMemoryBytes: $post_load_memory_bytes,
+                postLoadCpuPercent: $post_load_cpu_percent
             },
             loadTest: {
                 outputDir: $output_dir,
@@ -180,6 +205,8 @@ jq -n \
                 httpReqFailedRate: ($load_summary[0].metrics.http_req_failed.value // 0),
                 avgDurationMs: ($load_summary[0].metrics.http_req_duration.avg // 0),
                 p95DurationMs: ($load_summary[0].metrics.http_req_duration["p(95)"] // 0),
+                successfulAvgDurationMs: ($load_summary[0].metrics["http_req_duration{expected_response:true}"].avg // 0),
+                successfulP95DurationMs: ($load_summary[0].metrics["http_req_duration{expected_response:true}"]["p(95)"] // 0),
                 summaryFile: ($output_dir + "/summary.json"),
                 summaryTextFile: ($output_dir + "/summary.txt"),
                 logFile: ($output_dir + "/k6.log")

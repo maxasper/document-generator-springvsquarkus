@@ -52,7 +52,6 @@ Both runtime applications keep `in-memory` as the default local mode and expose 
 - [docs/testing/benchmark-architecture.md](docs/testing/benchmark-architecture.md)
 - [docs/testing/runtime-verification.md](docs/testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](docs/testing/jvm-runtime-comparison.md)
-- [docs/testing/native-image-comparison.md](docs/testing/native-image-comparison.md)
 - [docs/testing/manual-container-runtime-inspection.md](docs/testing/manual-container-runtime-inspection.md)
 - [docs/testing/container-runtime-matrix-comparison.md](docs/testing/container-runtime-matrix-comparison.md)
 - [openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md](openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md)
@@ -66,8 +65,8 @@ Recent archived changes cover:
 
 - PostgreSQL-backed runtime verification
 - JVM runtime comparison
-- native-image comparison
 - manual Compose-based container inspection, container resource limits, and repository-local load testing
+- automated container runtime matrix comparison across `spring/quarkus x jvm/native`
 
 ## Maven Wrapper
 
@@ -106,16 +105,14 @@ The quality baseline is intentionally shared across Spring Boot and Quarkus so t
 Use the overview and workflow guides under `docs/testing/` depending on what you want to run:
 
 - [Benchmark Architecture](docs/testing/benchmark-architecture.md)
-  - overview of the repository's verification, host-JVM benchmark, native benchmark, manual container inspection, and container-matrix flows
+  - overview of the repository's verification, host-JVM benchmark, manual container inspection, and container-matrix flows
 - [Runtime Verification](docs/testing/runtime-verification.md)
   - shared contract verification for Spring Boot and Quarkus in `in-memory` and PostgreSQL-backed modes
 - [JVM Runtime Comparison](docs/testing/jvm-runtime-comparison.md)
   - repository-local JVM benchmark flows and generated report layout
-- [Native Image Comparison](docs/testing/native-image-comparison.md)
-  - repository-local native benchmark flows and native-specific interpretation limits
 - [Manual Container Runtime Inspection](docs/testing/manual-container-runtime-inspection.md)
   - Compose-based PostgreSQL plus one selected JVM or native runtime, optional JMX for JVM scenarios, container limits, and repository-local `k6` load testing
 - [Container Runtime Matrix Comparison](docs/testing/container-runtime-matrix-comparison.md)
-  - unattended Docker-to-Docker comparison across `spring/quarkus x jvm/native` under one shared limit and load profile
+  - unattended Docker-to-Docker comparison across `spring/quarkus x jvm/native` under one shared limit and load profile, including the repository's supported native-container comparison path
 
 For comparison framing, metric interpretation, and reporting conventions across these workflows, see [docs/runtime-comparison-plan.md](docs/runtime-comparison-plan.md).

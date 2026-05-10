@@ -10,7 +10,7 @@ The repository SHALL use `README.md` as the entrypoint for testing and benchmark
 
 #### Scenario: Repository guide links to the supported workflow documents
 - **WHEN** a developer opens `README.md` to find testing or benchmarking instructions
-- **THEN** the repository guide links to dedicated documents for runtime verification, host JVM runtime comparison, native-image comparison, manual container runtime inspection, and automated container runtime matrix comparison
+- **THEN** the repository guide links to dedicated documents for runtime verification, host JVM runtime comparison, manual container runtime inspection, automated container runtime matrix comparison, and the benchmark architecture overview
 
 ### Requirement: Workflow documents are organized by operator intent
 The repository SHALL provide one dedicated workflow document per supported manual testing or benchmarking scenario under `docs/testing/`.

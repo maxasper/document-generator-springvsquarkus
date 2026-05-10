@@ -6,13 +6,12 @@ Detailed operator steps still live in the workflow guides:
 
 - [runtime-verification.md](runtime-verification.md)
 - [jvm-runtime-comparison.md](jvm-runtime-comparison.md)
-- [native-image-comparison.md](native-image-comparison.md)
 - [manual-container-runtime-inspection.md](manual-container-runtime-inspection.md)
 - [container-runtime-matrix-comparison.md](container-runtime-matrix-comparison.md)
 
 ## What Exists Today
 
-The repository currently has four runtime-evaluation paths plus one non-benchmark verification path:
+The repository currently has three runtime-evaluation paths plus one non-benchmark verification path:
 
 - `Runtime Verification`
   - purpose: confirm behavior, not performance
@@ -22,10 +21,6 @@ The repository currently has four runtime-evaluation paths plus one non-benchmar
   - purpose: compare Spring Boot and Quarkus as host-run JVM applications
   - PostgreSQL runs in Docker, but the runtime applications do not
   - output root: `target/jvm-runtime-comparison/`
-- `Native Image Comparison`
-  - purpose: compare Spring Boot and Quarkus in native mode while preserving each framework's native build path
-  - native runtimes run in containers
-  - output root: `target/native-image-comparison/`
 - `Manual Container Runtime Inspection`
   - purpose: keep one selected JVM or native container online, inspect it manually, constrain resources, and run `k6`
   - this is an interactive operator workflow, not a consolidated comparison harness
@@ -64,26 +59,6 @@ Execution model:
 
 This harness measures JVM applications without Docker container limits on the application process.
 
-### Native Image Comparison
-
-Main scripts:
-
-- `scripts/benchmark-native-runtime.sh`
-- `scripts/benchmark-native-comparison.sh`
-
-Execution model:
-
-1. build Spring Boot and Quarkus with their framework-native native-image paths
-2. recreate the PostgreSQL baseline from `compose.postgres-verification.yml`
-3. start the produced native runtime container
-4. wait for readiness on `GET /api/v1/document-generations`
-5. rerun the shared contract tests before measured benchmarking starts
-6. run warmup requests and measured requests from `benchmarks/native-image-comparison-workload.json`
-7. capture OCI image size, startup duration, latency summaries, and current container memory usage from `docker stats`
-8. write per-runtime `report.json`, then merge Spring Boot and Quarkus into a combined comparison report
-
-This harness compares native runtime behavior, but it does not reuse the manual `DG_RUNTIME_*` limit controls.
-
 ### Manual Container Runtime Inspection
 
 Main scripts:
@@ -118,19 +93,17 @@ Execution model:
 4. write a scenario-level `report.json`
 5. merge all four scenario reports into one matrix `report.json` and one summary table
 
-This is the most complete Docker-to-Docker comparison path in the repository today.
+This is the supported automated Docker-to-Docker comparison path in the repository today. It covers the repository's current native-container comparison use case instead of relying on a separate native-only benchmark harness.
 
 ## How Load Is Generated
 
 The repository uses two different load styles on purpose.
 
-For `JVM Runtime Comparison` and `Native Image Comparison`:
+For `JVM Runtime Comparison`:
 
 - requests are driven directly by the benchmark shell scripts
 - latency is measured from `curl` response timing
-- the measured workload is defined in:
-  - `benchmarks/jvm-runtime-comparison-workload.json`
-  - `benchmarks/native-image-comparison-workload.json`
+- the measured workload is defined in `benchmarks/jvm-runtime-comparison-workload.json`
 
 For `Manual Container Runtime Inspection` and `Container Runtime Matrix Comparison`:
 
@@ -159,16 +132,6 @@ Not every harness measures the same thing in the same way.
 - `generateLatencyMs`
 - `historyLatencyMs`
 
-`Native Image Comparison` reports:
-
-- `contractVerification.durationMs`
-- `buildDurationMs`
-- `artifactSizeBytes`
-- `startupDurationMs`
-- `steadyStateMemoryBytes`
-- `generateLatencyMs`
-- `historyLatencyMs`
-
 `Container Runtime Matrix Comparison` reports:
 
 - `buildDurationMs`
@@ -184,7 +147,6 @@ Not every harness measures the same thing in the same way.
 The most important interpretation difference is memory:
 
 - host JVM comparison uses host-process RSS
-- native comparison uses current container memory usage from `docker stats`
 - container matrix comparison also uses current container memory usage from `docker stats`
 
 Those numbers are all useful, but they are not the same measurement and should not be merged into one table without that caveat.
@@ -217,6 +179,5 @@ Use:
 
 - `runtime-verification.md` when you want to validate correctness
 - `jvm-runtime-comparison.md` when you want host JVM metrics without Docker application containers
-- `native-image-comparison.md` when you want framework-native native comparison
 - `manual-container-runtime-inspection.md` when you want to keep one container online and inspect it interactively
 - `container-runtime-matrix-comparison.md` when you want one automated Docker report across all four scenarios

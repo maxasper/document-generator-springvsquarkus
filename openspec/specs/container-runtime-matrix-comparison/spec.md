@@ -37,3 +37,14 @@ The repository SHALL write one machine-readable report and one human-readable su
 #### Scenario: Human-readable summary shows the four-scenario comparison table
 - **WHEN** a container runtime matrix run completes
 - **THEN** the repository writes a summary table that allows the developer to compare the four runtime scenarios without opening the raw JSON report
+
+### Requirement: Automated matrix native scenarios use real framework-native images
+The automated container runtime matrix SHALL build the `spring-native` and `quarkus-native` scenarios as true native executable container images using the documented framework-native build paths for each runtime.
+
+#### Scenario: Spring Boot native matrix scenario uses Spring Boot native buildpacks mode
+- **WHEN** the matrix flow builds the `spring-native` scenario image
+- **THEN** it enables the Spring Boot native buildpacks path so the produced image runs as a native executable container rather than a JVM container image
+
+#### Scenario: Quarkus native matrix scenario keeps the Quarkus native container-build path
+- **WHEN** the matrix flow builds the `quarkus-native` scenario image
+- **THEN** it uses the documented Quarkus native container-build path that produces the native runner and packages it as the runtime image

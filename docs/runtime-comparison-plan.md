@@ -9,7 +9,6 @@ The overview and detailed operator procedures now live in these documents:
 - [docs/testing/benchmark-architecture.md](testing/benchmark-architecture.md)
 - [docs/testing/runtime-verification.md](testing/runtime-verification.md)
 - [docs/testing/jvm-runtime-comparison.md](testing/jvm-runtime-comparison.md)
-- [docs/testing/native-image-comparison.md](testing/native-image-comparison.md)
 - [docs/testing/manual-container-runtime-inspection.md](testing/manual-container-runtime-inspection.md)
 - [docs/testing/container-runtime-matrix-comparison.md](testing/container-runtime-matrix-comparison.md)
 
@@ -39,34 +38,6 @@ Interpretation limits for the current JVM harness:
 - Spring Boot size is measured from the packaged fat jar
 - Quarkus size is measured from the packaged `quarkus-app/` directory
 - RSS capture is Linux-first in the current implementation
-
-## Native Image Mode
-
-Current workload and report contract:
-
-- workload definition: `benchmarks/native-image-comparison-workload.json`
-- machine-readable report shape: `benchmarks/native-image-comparison-report.schema.json`
-- generated output root: `target/native-image-comparison/`
-
-Current native metrics:
-
-- contract-verification duration after runtime readiness and before measured requests
-- native build time
-- produced OCI image size
-- cold startup time for both applications
-- steady-state container memory usage
-- measured latency for generate and history endpoints
-
-Interpretation limits for the current native harness:
-
-- it is a local developer benchmark, not a CI gate or production load test
-- compare runs only on the same machine and under similar background load
-- the PostgreSQL baseline is recreated between Spring Boot and Quarkus runs
-- Spring Boot and Quarkus intentionally use different framework-native build strategies in native mode
-- Spring Boot size is measured from the produced OCI image built with Spring Boot buildpacks
-- Quarkus size is measured from the produced OCI image built from the Quarkus native runner and `Dockerfile.native-micro`
-- memory is measured as current Docker container memory usage rather than host-process RSS
-- native benchmark runs do not use the manual inspection `DG_RUNTIME_*` container-limit controls
 
 ## Manual Container Runtime Evaluation
 
@@ -104,6 +75,7 @@ Current automated container-matrix capabilities:
 - reuse the same `DG_RUNTIME_*` resource controls across the full four-scenario run
 - reuse the same `LOAD_TEST_*` profile across the full four-scenario run
 - write scenario-level startup and runtime logs plus a combined summary table
+- keep the native scenarios on their framework-native image build paths while treating the matrix as the supported Docker-native comparison workflow
 
 Interpretation limits for the current container-matrix flow:
 

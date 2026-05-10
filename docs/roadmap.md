@@ -35,10 +35,10 @@
 ## 7. Comparison Tooling Completed
 
 - add repository-local JVM comparison flows
-- add repository-local native-image comparison flows
 - add manual Compose-based JVM inspection with JMX, resource limits, and repository-local load testing
+- add automated container runtime matrix comparison across `spring/quarkus x jvm/native`
 
 ## 8. Current State
 
-- the repository now supports contract verification, host JVM comparison, native-image comparison, manual container runtime inspection, and automated container runtime matrix comparison against the same PostgreSQL-backed baseline
+- the repository now supports contract verification, host JVM comparison, manual container runtime inspection, and automated container runtime matrix comparison against the same PostgreSQL-backed baseline
 - future work should be described as new changes in `openspec/` rather than inferred from this completed milestone list

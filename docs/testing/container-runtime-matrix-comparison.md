@@ -10,6 +10,7 @@ Use this workflow when you want the Docker-to-Docker comparison path for all fou
 - `quarkus-native`
 
 This is the automated counterpart to the manual container runtime inspection guide.
+It is also the supported automated container-native comparison path in this repository.
 
 ## Prerequisites
 
@@ -62,6 +63,7 @@ Each automated container scenario:
 8. tears the Compose environment down automatically
 
 The combined matrix script runs the four scenarios sequentially, reusing the same configured limits and load profile for every scenario in the run.
+For native scenarios, Spring Boot and Quarkus keep their framework-native image build paths rather than sharing one repository-specific native Docker packaging shortcut.
 
 ## Output Layout
 
@@ -131,6 +133,7 @@ benchmarks/container-runtime-matrix-workload.json
 ## Interpretation Limits
 
 - this is the containerized comparison path; the host JVM benchmark scripts remain a separate workflow
+- this repository no longer keeps a second standalone native-only benchmark harness alongside the container matrix
 - compare runs only on the same machine and under similar background load
 - the same `DG_RUNTIME_*` and `LOAD_TEST_*` settings should be reused if you want the four-scenario report to be comparable
 - Spring Boot and Quarkus intentionally keep different framework-native build strategies in native mode
