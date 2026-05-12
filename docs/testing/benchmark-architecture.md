@@ -88,10 +88,12 @@ Main scripts:
 Execution model:
 
 1. read the four-scenario list from `benchmarks/container-runtime-matrix-workload.json`
-2. for each scenario, build the image, start `postgres` plus that runtime, and run the shared `k6` workload
-3. capture image size, startup duration, container memory, container CPU snapshot, and load-test summary metrics
-4. write a scenario-level `report.json`
-5. merge all four scenario reports into one matrix `report.json` and one summary table
+2. for each scenario, build the image once
+3. run the configured `post`, `get`, and `mixed` workload cases, resetting `postgres` and the runtime before each case
+4. seed a deterministic history before each measured `get` case
+5. capture image size, startup duration, per-case container memory, per-case container CPU samples, and load-test summary metrics
+6. write a scenario-level `report.json`
+7. merge all four scenario reports into one matrix `report.json` and one summary table
 
 This is the supported automated Docker-to-Docker comparison path in the repository today. It covers the repository's current native-container comparison use case instead of relying on a separate native-only benchmark harness.
 
@@ -111,13 +113,13 @@ For `Manual Container Runtime Inspection` and `Container Runtime Matrix Comparis
 - the scenario is implemented in `scripts/runtime-load-test.js`
 - the shared workload file is `benchmarks/runtime-load-testing-workload.json`
 - default profile is `10` virtual users for `30s`
-- runtime overrides come from `LOAD_TEST_VUS` and `LOAD_TEST_DURATION`
+- runtime overrides come from `LOAD_TEST_VUS`, `LOAD_TEST_DURATION`, `LOAD_TEST_CASES`, and `LOAD_TEST_GET_SEED_ROWS`
 
-Each `k6` iteration currently does:
+The workload cases are:
 
-1. `POST /api/v1/document-generations`
-2. `GET /api/v1/document-generations`
-3. `sleep(1)`
+- `post`: `POST /api/v1/document-generations`
+- `get`: `GET /api/v1/document-generations` against a deterministic seeded history in the automated matrix
+- `mixed`: the original `POST`, `GET`, and `sleep(1)` workflow
 
 ## What The Metrics Mean
 
@@ -143,11 +145,12 @@ Not every harness measures the same thing in the same way.
 - `loadTest.httpReqFailedRate`
 - `loadTest.avgDurationMs`
 - `loadTest.p95DurationMs`
+- `loadTest.cases.<case>.successfulP95DurationMs`
 
 The most important interpretation difference is memory:
 
 - host JVM comparison uses host-process RSS
-- container matrix comparison also uses current container memory usage from `docker stats`
+- container matrix comparison uses per-case container observations from `docker stats`
 
 Those numbers are all useful, but they are not the same measurement and should not be merged into one table without that caveat.
 
@@ -157,7 +160,7 @@ The benchmark scripts try to keep comparisons fair in these ways:
 
 - Spring Boot and Quarkus always use the same PostgreSQL-backed baseline for a given harness
 - paired runs execute sequentially, not in parallel
-- PostgreSQL is recreated between runtimes or scenarios
+- PostgreSQL is recreated between runtimes, scenarios, and automated container workload cases
 - request shape stays the same within each harness
 - the container matrix reuses the same `DG_RUNTIME_*` and `LOAD_TEST_*` settings across all four scenarios
 
@@ -169,7 +172,7 @@ Keep these limits in mind:
 
 - compare only runs produced on the same machine and under similar background load
 - native build time is sensitive to Docker cache state and builder image reuse
-- `cpuPercent` in the container matrix is a snapshot, not a full time-series CPU profile
+- CPU in the container matrix is a Docker-level per-case container observation, not a JVM CPU profile
 - JVM JMX-based tooling applies only to JVM scenarios
 - manual container inspection and unattended matrix comparison answer different questions even when they use the same Compose assets
 

@@ -428,3 +428,24 @@ compose_runtime_configured_vus() {
 compose_runtime_configured_duration() {
     echo "${LOAD_TEST_DURATION:-$(compose_runtime_load_test_value '.loadProfile.duration')}"
 }
+
+compose_runtime_configured_load_cases() {
+    echo "${LOAD_TEST_CASES:-post,get,mixed}"
+}
+
+compose_runtime_configured_get_seed_rows() {
+    echo "${LOAD_TEST_GET_SEED_ROWS:-100}"
+}
+
+compose_runtime_validate_load_case() {
+    local load_test_case="$1"
+
+    case "$load_test_case" in
+        post|get|mixed)
+            ;;
+        *)
+            echo "Unsupported load-test case: $load_test_case" >&2
+            return 1
+            ;;
+    esac
+}

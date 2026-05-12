@@ -175,7 +175,8 @@ Generated load-test output is written under `target/runtime-load-testing/`:
 - each run emits:
   - `summary.json`
   - `summary.txt`
-  - `k6.log`
+  - case-specific directories such as `post/`, `get/`, and `mixed/`
+  - each case directory contains `k6.log`, `k6-summary.json`, `container-stats.log`, and `container-observation.json`
 
 The generic load-test helper also allows a custom output directory anywhere under `target/`.
 
@@ -234,6 +235,8 @@ Shared load-test controls:
 
 - `LOAD_TEST_VUS`
 - `LOAD_TEST_DURATION`
+- `LOAD_TEST_CASES` as a comma-separated list of `post`, `get`, and `mixed`; default is `post,get,mixed`
+- `LOAD_TEST_CASE` for a single selected case; useful when a runtime is already running and you want one focused measurement
 
 Example:
 
@@ -242,6 +245,12 @@ LOAD_TEST_VUS=20 \
 LOAD_TEST_DURATION=45s \
 ./scripts/load-test-spring-native-compose.sh
 ```
+
+The workload cases are:
+
+- `post`: sends document-generation create requests only
+- `get`: reads document-generation history only
+- `mixed`: preserves the original write-then-read workflow, including the one-second think time
 
 If you want to change the request shape, thresholds, or default `k6` profile, edit:
 

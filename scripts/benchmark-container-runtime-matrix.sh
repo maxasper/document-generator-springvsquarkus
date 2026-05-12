@@ -33,8 +33,10 @@ jq -s \
     --arg jvm_max_ram_percentage "$(compose_runtime_configured_max_ram_percentage)" \
     --arg vus "$(compose_runtime_configured_vus)" \
     --arg duration "$(compose_runtime_configured_duration)" \
+    --arg load_cases "$(compose_runtime_configured_load_cases)" \
     --argjson environment "$(benchmark_environment_json)" \
     --argjson pids_limit "$(compose_runtime_configured_pids_limit)" \
+    --argjson get_seed_rows "$(compose_runtime_configured_get_seed_rows)" \
     '{
         schemaVersion: 1,
         benchmarkName: "container-runtime-matrix",
@@ -50,31 +52,45 @@ jq -s \
         },
         configuredLoadProfile: {
             vus: ($vus | tonumber),
-            duration: $duration
+            duration: $duration,
+            cases: ($load_cases | split(",")),
+            getSeedRows: $get_seed_rows
         },
         runs: map(.run)
     }' "$output_dir"/*/report.json >"$report_file"
 
 {
     echo "Container runtime matrix summary"
-    printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s %-10s\n" "scenario" "build(ms)" "startup(ms)" "memory(bytes)" "cpu(%)" "reqs" "failed" "p95(ms)" "p95_ok(ms)"
+    printf "%-15s %-7s %-10s %-12s %-13s %-12s %-12s %-8s %-10s %-10s %-10s\n" "scenario" "case" "build(ms)" "startup(ms)" "memory(bytes)" "cpu_avg(%)" "cpu_max(%)" "reqs" "failed" "p95(ms)" "p95_ok(ms)"
     jq -r '
+        def round_to($scale): (. * $scale | round) / $scale;
+        def display_number($scale):
+            if . == null then "n/a" else (round_to($scale) | tostring) end;
+        def display_raw:
+            if . == null then "n/a" else tostring end;
         .runs[]
+        | . as $run
+        | ($run.loadTest.cases | to_entries[])
+        | .key as $case
+        | .value as $load_case
+        | ($load_case.containerObservation // {}) as $container
         | [
-            .scenario,
-            (.buildDurationMs | tostring),
-            (.startupDurationMs | tostring),
-            (.containerObservation.memoryBytes | tostring),
-            (.containerObservation.cpuPercent | tostring),
-            (.loadTest.httpReqs | tostring),
-            (.loadTest.httpReqFailedRate | tostring),
-            (.loadTest.p95DurationMs | tostring),
-            (.loadTest.successfulP95DurationMs // .loadTest.p95DurationMs | tostring)
+            $run.scenario,
+            $case,
+            ($run.buildDurationMs | tostring),
+            ($load_case.startupDurationMs // $run.startupDurationMs | tostring),
+            (($container.memoryBytes // $run.containerObservation.memoryBytes // null) | display_raw),
+            (($container.cpuAvgPercent // $run.containerObservation.cpuPercent // null) | display_number(100)),
+            (($container.cpuMaxPercent // $run.containerObservation.sampledCpuMaxPercent // $run.containerObservation.cpuPercent // null) | display_number(100)),
+            ($load_case.httpReqs | tostring),
+            (($load_case.httpReqFailedRate // null) | display_number(10000)),
+            (($load_case.p95DurationMs // null) | display_number(10)),
+            (($load_case.successfulP95DurationMs // null) | display_number(10))
         ]
         | @tsv
-    ' "$report_file" | while IFS=$'\t' read -r scenario build startup memory_bytes cpu reqs failed p95 successful_p95; do
-        printf "%-15s %-10s %-12s %-13s %-12s %-8s %-10s %-10s %-10s\n" \
-            "$scenario" "$build" "$startup" "$memory_bytes" "$cpu" "$reqs" "$failed" "$p95" "$successful_p95"
+    ' "$report_file" | while IFS=$'\t' read -r scenario load_case build startup memory_bytes cpu_avg cpu_max reqs failed p95 successful_p95; do
+        printf "%-15s %-7s %-10s %-12s %-13s %-12s %-12s %-8s %-10s %-10s %-10s\n" \
+            "$scenario" "$load_case" "$build" "$startup" "$memory_bytes" "$cpu_avg" "$cpu_max" "$reqs" "$failed" "$p95" "$successful_p95"
     done
 } >"$summary_file"
 

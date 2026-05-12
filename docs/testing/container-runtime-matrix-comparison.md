@@ -54,13 +54,14 @@ Run the combined four-scenario matrix:
 Each automated container scenario:
 
 1. builds the selected runtime image through the repository-local build entrypoint
-2. resets the Compose environment
-3. starts PostgreSQL plus one selected runtime scenario
+2. runs the configured workload cases, defaulting to `post`, then `get`, then `mixed`
+3. resets the Compose environment before every workload case
 4. waits until `GET /api/v1/document-generations` returns `200`
-5. runs the shared repository-local `k6` workload against that running container
-6. captures container memory and CPU snapshots after the load test
-7. writes scenario-level startup logs, runtime logs, load-test artifacts, and a machine-readable scenario report
-8. tears the Compose environment down automatically
+5. seeds a deterministic document-generation history before the measured `get` case
+6. runs the selected repository-local `k6` workload case against that running container
+7. captures container memory and CPU samples for that workload case
+8. writes scenario-level startup logs, runtime logs, load-test artifacts, and a machine-readable scenario report
+9. tears the Compose environment down automatically
 
 The combined matrix script runs the four scenarios sequentially, reusing the same configured limits and load profile for every scenario in the run.
 For native scenarios, Spring Boot and Quarkus keep their framework-native image build paths rather than sharing one repository-specific native Docker packaging shortcut.
@@ -69,12 +70,14 @@ For native scenarios, Spring Boot and Quarkus keep their framework-native image 
 
 Per-scenario runs emit:
 
-- `startup.log`
-- `runtime.log`
 - `load-test/summary.json`
 - `load-test/summary.txt`
-- `load-test/k6.log`
+- `load-test/post/`
+- `load-test/get/`
+- `load-test/mixed/`
 - `report.json`
+
+Each case directory contains the case startup log, runtime log, k6 log, k6 summary, container stats samples, and container observation JSON.
 
 Combined matrix runs emit:
 
@@ -100,6 +103,8 @@ Shared load-test controls for every scenario in the matrix:
 
 - `LOAD_TEST_VUS`
 - `LOAD_TEST_DURATION`
+- `LOAD_TEST_CASES` as a comma-separated ordered list of `post`, `get`, and `mixed`; default is `post,get,mixed`
+- `LOAD_TEST_GET_SEED_ROWS` for the deterministic history size used before each measured `get` case; default is `100`
 
 Example:
 
@@ -112,6 +117,12 @@ LOAD_TEST_VUS=20 \
 LOAD_TEST_DURATION=45s \
 ./scripts/benchmark-container-runtime-matrix.sh
 ```
+
+The workload cases are reported as separate rows in `summary.txt`:
+
+- `post`: create requests only
+- `get`: history reads against the configured seed size
+- `mixed`: the original write-then-read workflow, including think time, run last by default
 
 If you want to change the load-test request shape or thresholds, edit:
 
@@ -136,5 +147,7 @@ benchmarks/container-runtime-matrix-workload.json
 - this repository no longer keeps a second standalone native-only benchmark harness alongside the container matrix
 - compare runs only on the same machine and under similar background load
 - the same `DG_RUNTIME_*` and `LOAD_TEST_*` settings should be reused if you want the four-scenario report to be comparable
+- CPU and memory values in the matrix are Docker container observations scoped to the workload case, not JVM profiler measurements
+- `n/a` latency or resource values mean the measurement was unavailable, for example because no successful HTTP response was recorded
 - Spring Boot and Quarkus intentionally keep different framework-native build strategies in native mode
 - native scenarios expose container-level metrics only; JVM scenarios can also be inspected manually through JMX in the manual workflow

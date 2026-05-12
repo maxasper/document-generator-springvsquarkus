@@ -67,6 +67,20 @@
                 },
                 "duration": {
                     "type": "string"
+                },
+                "cases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "post",
+                            "get",
+                            "mixed"
+                        ]
+                    }
+                },
+                "getSeedRows": {
+                    "type": "integer"
                 }
             }
         },
@@ -147,22 +161,58 @@
                         ],
                         "properties": {
                             "memoryBytes": {
-                                "type": "integer"
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
                             },
                             "cpuPercent": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             },
                             "startupMemoryBytes": {
-                                "type": "integer"
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
                             },
                             "startupCpuPercent": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             },
                             "postLoadMemoryBytes": {
-                                "type": "integer"
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
                             },
                             "postLoadCpuPercent": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "sampledMemoryBytes": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "sampledCpuPercent": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "sampledCpuMaxPercent": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             }
                         }
                     },
@@ -180,6 +230,22 @@
                             "outputDir": {
                                 "type": "string"
                             },
+                            "cases": {
+                                "type": "object",
+                                "minProperties": 1,
+                                "additionalProperties": false,
+                                "properties": {
+                                    "post": {
+                                        "$ref": "#/$defs/loadTestCase"
+                                    },
+                                    "get": {
+                                        "$ref": "#/$defs/loadTestCase"
+                                    },
+                                    "mixed": {
+                                        "$ref": "#/$defs/loadTestCase"
+                                    }
+                                }
+                            },
                             "iterations": {
                                 "type": "integer"
                             },
@@ -190,17 +256,123 @@
                                 "type": "number"
                             },
                             "avgDurationMs": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             },
                             "p95DurationMs": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             },
                             "successfulAvgDurationMs": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             },
                             "successfulP95DurationMs": {
-                                "type": "number"
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
                             }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "loadTestCase": {
+            "type": "object",
+            "required": [
+                "iterations",
+                "httpReqs",
+                "httpReqFailedRate",
+                "avgDurationMs",
+                "p95DurationMs"
+            ],
+            "properties": {
+                "outputDir": {
+                    "type": "string"
+                },
+                "iterations": {
+                    "type": "integer"
+                },
+                "httpReqs": {
+                    "type": "integer"
+                },
+                "httpReqFailedRate": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "avgDurationMs": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "p95DurationMs": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "successfulAvgDurationMs": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "successfulP95DurationMs": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                },
+                "startupDurationMs": {
+                    "type": "integer"
+                },
+                "startupLog": {
+                    "type": "string"
+                },
+                "runtimeLog": {
+                    "type": "string"
+                },
+                "summaryFile": {
+                    "type": "string"
+                },
+                "logFile": {
+                    "type": "string"
+                },
+                "containerObservation": {
+                    "type": "object",
+                    "properties": {
+                        "statsFile": {
+                            "type": "string"
+                        },
+                        "memoryBytes": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "cpuAvgPercent": {
+                            "type": [
+                                "number",
+                                "null"
+                            ]
+                        },
+                        "cpuMaxPercent": {
+                            "type": [
+                                "number",
+                                "null"
+                            ]
                         }
                     }
                 }

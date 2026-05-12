@@ -6,9 +6,14 @@ const workload = JSON.parse(open("/workspace/benchmarks/runtime-load-testing-wor
 const baseUrl = __ENV.BASE_URL;
 const vus = Number(__ENV.LOAD_TEST_VUS || workload.loadProfile.vus);
 const duration = __ENV.LOAD_TEST_DURATION || workload.loadProfile.duration;
+const testCase = __ENV.LOAD_TEST_CASE || "mixed";
 
 if (!baseUrl) {
     throw new Error("BASE_URL environment variable is required");
+}
+
+if (!["post", "get", "mixed"].includes(testCase)) {
+    throw new Error(`Unsupported LOAD_TEST_CASE: ${testCase}. Expected one of: post, get, mixed`);
 }
 
 export const options = {
@@ -32,8 +37,8 @@ function buildGenerateRequestBody() {
     });
 }
 
-export default function () {
-    const generateResponse = http.post(
+function postGenerate() {
+    return http.post(
         `${baseUrl}${workload.endpoints.generate.path}`,
         buildGenerateRequestBody(),
         {
@@ -42,12 +47,35 @@ export default function () {
             },
         },
     );
+}
 
+function getHistory() {
+    return http.get(`${baseUrl}${workload.endpoints.history.path}`);
+}
+
+export default function () {
+    if (testCase === "post") {
+        const generateResponse = postGenerate();
+        check(generateResponse, {
+            "post returns 200": (response) => response.status === 200,
+        });
+        return;
+    }
+
+    if (testCase === "get") {
+        const historyResponse = getHistory();
+        check(historyResponse, {
+            "get returns 200": (response) => response.status === 200,
+        });
+        return;
+    }
+
+    const generateResponse = postGenerate();
     check(generateResponse, {
         "generate returns 200": (response) => response.status === 200,
     });
 
-    const historyResponse = http.get(`${baseUrl}${workload.endpoints.history.path}`);
+    const historyResponse = getHistory();
     check(historyResponse, {
         "history returns 200": (response) => response.status === 200,
     });
