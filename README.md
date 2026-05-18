@@ -54,8 +54,7 @@ Both runtime applications keep `in-memory` as the default local mode and expose 
 - [docs/testing/jvm-runtime-comparison.md](docs/testing/jvm-runtime-comparison.md)
 - [docs/testing/manual-container-runtime-inspection.md](docs/testing/manual-container-runtime-inspection.md)
 - [docs/testing/container-runtime-matrix-comparison.md](docs/testing/container-runtime-matrix-comparison.md)
-- [openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md](openspec/changes/archive/2026-04-20-add-runtime-e2e-verification/proposal.md)
-- [openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md](openspec/changes/archive/2026-04-20-establish-document-generator-foundation/proposal.md)
+foundation/proposal.md)
 
 ## Spec-First Workflow
 
