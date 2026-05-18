@@ -54,7 +54,6 @@ Both runtime applications keep `in-memory` as the default local mode and expose 
 - [docs/testing/jvm-runtime-comparison.md](docs/testing/jvm-runtime-comparison.md)
 - [docs/testing/manual-container-runtime-inspection.md](docs/testing/manual-container-runtime-inspection.md)
 - [docs/testing/container-runtime-matrix-comparison.md](docs/testing/container-runtime-matrix-comparison.md)
-foundation/proposal.md)
 
 ## Spec-First Workflow
 
