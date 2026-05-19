@@ -24,7 +24,11 @@ benchmark_now_utc() {
 }
 
 benchmark_epoch_ms() {
-    date +%s%3N
+    if command -v perl >/dev/null 2>&1; then
+        perl -MTime::HiRes=time -e 'printf "%.0f\n", time() * 1000'
+    else
+        echo "$(date +%s)000"
+    fi
 }
 
 benchmark_duration_ms() {
@@ -36,9 +40,17 @@ benchmark_duration_ms() {
 benchmark_measure_artifact_size_bytes() {
     local artifact_path="$1"
     if [[ -d "$artifact_path" ]]; then
-        du -sb "$artifact_path" | awk '{print $1}'
+        if [[ "$(uname -s)" == "Darwin" ]]; then
+            find "$artifact_path" -type f -exec stat -f "%z" {} + | awk '{sum += $1} END {print sum + 0}'
+        else
+            du -sb "$artifact_path" | awk '{print $1}'
+        fi
     else
-        stat -c "%s" "$artifact_path"
+        if [[ "$(uname -s)" == "Darwin" ]]; then
+            stat -f "%z" "$artifact_path"
+        else
+            stat -c "%s" "$artifact_path"
+        fi
     fi
 }
 
@@ -87,7 +99,26 @@ benchmark_available_processors() {
 }
 
 benchmark_total_memory_kb() {
-    awk '/MemTotal:/ {print $2; exit}' /proc/meminfo
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        hostinfo | awk '
+            /Primary memory available:/ {
+                value = $4
+                unit = $5
+                if (unit ~ /^giga/) {
+                    printf "%d\n", value * 1024 * 1024
+                } else if (unit ~ /^mega/) {
+                    printf "%d\n", value * 1024
+                } else if (unit ~ /^kilo/) {
+                    printf "%d\n", value
+                } else {
+                    printf "%d\n", value / 1024
+                }
+                exit
+            }
+        '
+    else
+        awk '/MemTotal:/ {print $2; exit}' /proc/meminfo
+    fi
 }
 
 benchmark_java_version() {

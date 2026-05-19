@@ -184,9 +184,12 @@ sampled_case_memory_max_bytes() {
         }
         NF >= 2 {
             raw = $2
-            match(raw, /^([0-9.]+)([[:alpha:]]+)$/, parts)
-            if (parts[1] != "") {
-                bytes = parts[1] * unit_multiplier(parts[2])
+            number = raw
+            unit = raw
+            sub(/[^0-9.].*$/, "", number)
+            sub(/^[0-9.]+/, "", unit)
+            if (number != "") {
+                bytes = number * unit_multiplier(unit)
                 if (bytes > max) {
                     max = bytes
                     count += 1

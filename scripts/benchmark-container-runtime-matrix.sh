@@ -12,7 +12,10 @@ output_dir="$(container_runtime_matrix_prepare_output_dir matrix)"
 report_file="$output_dir/report.json"
 summary_file="$output_dir/summary.txt"
 
-mapfile -t scenarios < <(
+scenarios=()
+while IFS= read -r scenario; do
+    scenarios+=("$scenario")
+done < <(
     jq -r '.scenarios[] | "\(.runtime) \(.mode)"' "$container_runtime_matrix_workload_file"
 )
 

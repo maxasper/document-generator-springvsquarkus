@@ -24,7 +24,11 @@ compose_runtime_now_utc() {
 }
 
 compose_runtime_epoch_ms() {
-    date +%s%3N
+    if command -v perl >/dev/null 2>&1; then
+        perl -MTime::HiRes=time -e 'printf "%.0f\n", time() * 1000'
+    else
+        echo "$(date +%s)000"
+    fi
 }
 
 compose_runtime_duration_ms() {
@@ -361,12 +365,15 @@ compose_runtime_parse_human_size_to_bytes() {
             return 1;
         }
         BEGIN {
-            match(raw, /^([0-9.]+)([[:alpha:]]+)$/, parts);
-            if (parts[1] == "") {
+            number = raw;
+            unit = raw;
+            sub(/[^0-9.].*$/, "", number);
+            sub(/^[0-9.]+/, "", unit);
+            if (number == "") {
                 print 0;
                 exit;
             }
-            printf "%d\n", (parts[1] * unit_multiplier(parts[2])) + 0.5;
+            printf "%d\n", (number * unit_multiplier(unit)) + 0.5;
         }
     '
 }
